@@ -1,0 +1,15 @@
+components:
+  responses:
+    infoResponse:
+      description: "Information about service"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/infoDto"
+
+  schemas:
+    infoDto:
+      type: object
+      properties:
+        text:
+          type: string

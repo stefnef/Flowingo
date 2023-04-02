@@ -20,30 +20,9 @@ paths:
     $ref: "./path/resource.yaml#/resourceId"
 
   /info:
-    get:
-      tags:
-        - info
-      description: "Basic information"
-      responses:
-        200:
-          $ref: "#/components/responses/infoResponse"
+    $ref: "./path/info.yaml#/info"
 
 components:
-  responses:
-    infoResponse:
-      description: "Information about service"
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/infoDto"
-
-  schemas:
-    infoDto:
-      type: object
-      properties:
-        text:
-          type: string
-
   securitySchemes:
     bearerSecurity:
       type: http
