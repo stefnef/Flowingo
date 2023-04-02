@@ -5,4 +5,4 @@ components:
       required: true
       name: id
       schema:
-        type: string
+        $ref: "../model/resource.yaml#/components/schemas/id"

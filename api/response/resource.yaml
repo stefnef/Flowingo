@@ -27,7 +27,7 @@ components:
         - name
       properties:
         id:
-          type: string
+          $ref: "../model/resource.yaml#/components/schemas/id"
         name:
           $ref: "../model/resource.yaml#/components/schemas/resourceName"
         magicNumber:
