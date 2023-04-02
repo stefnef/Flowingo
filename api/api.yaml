@@ -20,17 +20,17 @@ paths:
       description: Returns all resources
       responses:
         200:
-          $ref: "#/components/responses/resourceListResponse"
+          $ref: "./response/resource.yaml#/components/responses/resourceListResponse"
 
     post:
       tags:
         - resource
       description: Adds a new resource
       requestBody:
-        $ref: "#/components/requestBodies/resourcePostBody"
+        $ref: "./request/resource.yaml#/components/requestBodies/resourcePostBody"
       responses:
         201:
-          $ref: "#/components/responses/resourceResponse"
+          $ref: "./response/resource.yaml#/components/responses/resourceResponse"
       security:
         - bearerSecurity: []
 
@@ -38,12 +38,12 @@ paths:
     get:
       tags:
         - resource
-      description: Retrieve resource with given id
+      description: "Retrieve resource with given id"
       parameters:
-        - $ref: "#/components/parameters/resourceId"
+        - $ref: "./parameters/parameters.yaml#/components/parameters/resourceId"
       responses:
         200:
-          $ref: "#/components/schemas/resourceResponseDto"
+          $ref: "./response/resource.yaml#/components/responses/resourceResponse"
 
   /info:
     get:
@@ -55,38 +55,7 @@ paths:
           $ref: "#/components/responses/infoResponse"
 
 components:
-  securitySchemes:
-    bearerSecurity:
-      type: http
-      name: access_token
-      in: header
-      scheme: bearer
-      bearerFormat: JWT
-
-  requestBodies:
-    resourcePostBody:
-      required: true
-      description: "Values of newly created resource"
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/resourcePostDto"
-
   responses:
-    resourceListResponse:
-      description: "List of all resources"
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/resourceListDto"
-
-    resourceResponse:
-      description: "A single resource"
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/resourceResponseDto"
-
     infoResponse:
       description: "Information about service"
       content:
@@ -94,48 +63,17 @@ components:
           schema:
             $ref: "#/components/schemas/infoDto"
 
-  parameters:
-    resourceId:
-      in: path
-      required: true
-      name: id
-      schema:
-        type: string
-
   schemas:
-    resourceListDto:
-      type: array
-      items:
-        $ref: "#/components/schemas/resourceResponseDto"
-
-    resourcePostDto:
-      type: object
-      required:
-        - name
-      properties:
-        name:
-          $ref: "#/components/schemas/resourceName"
-
-    resourceResponseDto:
-      type: object
-      required:
-        - id
-        - name
-      properties:
-        id:
-          type: string
-        name:
-          $ref: "#/components/schemas/resourceName"
-        magicNumber:
-          type: integer
-
-    resourceName:
-      type: string
-      minLength: 1
-      maxLength: 10
-
     infoDto:
       type: object
       properties:
         text:
           type: string
+
+  securitySchemes:
+    bearerSecurity:
+      type: http
+      name: access_token
+      in: header
+      scheme: bearer
+      bearerFormat: JWT

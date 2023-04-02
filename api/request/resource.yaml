@@ -1,0 +1,18 @@
+components:
+  requestBodies:
+    resourcePostBody:
+      required: true
+      description: "Values of newly created resource"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/resourcePostDto"
+
+  schemas:
+    resourcePostDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          $ref: "../model/resource.yaml#/components/schemas/resourceName"
