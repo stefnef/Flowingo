@@ -1,0 +1,8 @@
+components:
+  parameters:
+    resourceId:
+      in: path
+      required: true
+      name: id
+      schema:
+        $ref: "../model/resource.yaml#/components/schemas/id"

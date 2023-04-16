@@ -1,0 +1,11 @@
+components:
+  schemas:
+    resourceName:
+      type: string
+      minLength: 1
+      maxLength: 10
+
+    id:
+      type: string
+      minLength: 16
+      maxLength: 256

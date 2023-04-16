@@ -1,0 +1,31 @@
+resource:
+  get:
+    tags:
+      - resource
+    description: Returns all resources
+    responses:
+      200:
+        $ref: "../response/resource.yaml#/components/responses/resourceListResponse"
+
+  post:
+    tags:
+      - resource
+    description: Adds a new resource
+    requestBody:
+      $ref: "../request/resource.yaml#/components/requestBodies/resourcePostBody"
+    responses:
+      201:
+        $ref: "../response/resource.yaml#/components/responses/resourceResponse"
+    security:
+      - bearerSecurity: [ ]
+
+resourceId:
+    get:
+      tags:
+        - resource
+      description: "Retrieve resource with given id"
+      parameters:
+        - $ref: "../parameter/resource.yaml#/components/parameters/resourceId"
+      responses:
+        200:
+          $ref: "../response/resource.yaml#/components/responses/resourceResponse"

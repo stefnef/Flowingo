@@ -1,0 +1,8 @@
+info:
+  get:
+    tags:
+      - info
+    description: "Basic information"
+    responses:
+      200:
+        $ref: "../response/info.yaml#/components/responses/infoResponse"

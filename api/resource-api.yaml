@@ -1,0 +1,32 @@
+openapi: 3.0.3
+info:
+  title: resource
+  description: resource
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080'
+
+tags:
+  - name: info
+    description: Server information
+  - name: resource
+    description: Operations on resource
+
+paths:
+  /resource:
+    $ref: "./path/resource.yaml#/resource"
+
+  /resource/{id}:
+    $ref: "./path/resource.yaml#/resourceId"
+
+  /info:
+    $ref: "./path/info.yaml#/info"
+
+components:
+  securitySchemes:
+    bearerSecurity:
+      type: http
+      name: access_token
+      in: header
+      scheme: bearer
+      bearerFormat: JWT
