@@ -10,15 +10,15 @@
 package main
 
 import (
+	sw "github.com/stefnef/Flowingo/m/internal/api/http"
 	"log"
-
-	sw "github.com/stefnef/Flowingo/m/api"
 )
 
 func main() {
 	log.Printf("Server started")
 
 	router := sw.NewRouter()
+	_ = router.SetTrustedProxies(nil)
 
 	log.Fatal(router.Run(":8080"))
 }

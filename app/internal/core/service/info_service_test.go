@@ -4,11 +4,11 @@ import (
 	"testing"
 )
 
-var infoService = &InfoService{}
+var infoService = &InfoServiceImpl{}
 
 func TestGetInfo(t *testing.T) {
 
-	var info = infoService.getInfo()
+	var info = infoService.GetInfo()
 
 	if info == nil {
 		t.Fatal("info is nil")
