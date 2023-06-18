@@ -10,6 +10,8 @@
 package http
 
 import (
+	"github.com/stefnef/Flowingo/m/internal/api/http/handler"
+	"github.com/stefnef/Flowingo/m/internal/core/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -56,6 +58,8 @@ func Index(c *gin.Context) {
 	c.String(http.StatusOK, "Hello World!")
 }
 
+var infoHandler = handler.NewInfoHandler(&service.InfoServiceImpl{})
+
 var routes = Routes{
 	{
 		"Index",
@@ -68,7 +72,7 @@ var routes = Routes{
 		"InfoGet",
 		http.MethodGet,
 		"/info",
-		InfoGet,
+		infoHandler.GetInfo,
 	},
 
 	{

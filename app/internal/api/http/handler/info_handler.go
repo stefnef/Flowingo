@@ -1,21 +1,22 @@
 package handler
 
 import (
-	"github.com/stefnef/Flowingo/m/internal/api/http/dto"
+	"github.com/gin-gonic/gin"
 	"github.com/stefnef/Flowingo/m/internal/core/service"
+	"net/http"
 )
 
 type InfoHandler struct {
 	infoService service.InfoService
 }
 
-func (handler *InfoHandler) getInfo() *dto.InfoDto {
-	info := handler.infoService.GetInfo()
-	return &dto.InfoDto{Text: string(info.Text)}
-}
-
 func NewInfoHandler(infoService service.InfoService) *InfoHandler {
 	return &InfoHandler{
 		infoService: infoService,
 	}
+}
+
+func (handler *InfoHandler) GetInfo(c *gin.Context) {
+	info := handler.infoService.GetInfo()
+	c.JSON(http.StatusOK, info)
 }
