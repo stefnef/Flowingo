@@ -11,7 +11,6 @@ package http
 
 import (
 	"github.com/stefnef/Flowingo/m/internal/api/http/handler"
-	"github.com/stefnef/Flowingo/m/internal/core/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,8 +32,9 @@ type Route struct {
 type Routes []Route
 
 // NewRouter returns a new router.
-func NewRouter() *gin.Engine {
+func NewRouter(infoHandler handler.InfoHandler) *gin.Engine {
 	router := gin.Default()
+	routes := getRoutes(infoHandler)
 	for _, route := range routes {
 		switch route.Method {
 		case http.MethodGet:
@@ -58,41 +58,41 @@ func Index(c *gin.Context) {
 	c.String(http.StatusOK, "Hello World!")
 }
 
-var infoHandler = handler.NewInfoHandler(&service.InfoServiceImpl{})
+func getRoutes(infoHandler handler.InfoHandler) Routes {
+	return Routes{
+		{
+			"Index",
+			http.MethodGet,
+			"/",
+			Index,
+		},
 
-var routes = Routes{
-	{
-		"Index",
-		http.MethodGet,
-		"/",
-		Index,
-	},
+		{
+			"InfoGet",
+			http.MethodGet,
+			"/info",
+			infoHandler.GetInfo,
+		},
 
-	{
-		"InfoGet",
-		http.MethodGet,
-		"/info",
-		infoHandler.GetInfo,
-	},
+		{
+			"ResourceGet",
+			http.MethodGet,
+			"/resource",
+			ResourceGet,
+		},
 
-	{
-		"ResourceGet",
-		http.MethodGet,
-		"/resource",
-		ResourceGet,
-	},
+		{
+			"ResourceIdGet",
+			http.MethodGet,
+			"/resource/:id",
+			ResourceIdGet,
+		},
 
-	{
-		"ResourceIdGet",
-		http.MethodGet,
-		"/resource/:id",
-		ResourceIdGet,
-	},
-
-	{
-		"ResourcePost",
-		http.MethodPost,
-		"/resource",
-		ResourcePost,
-	},
+		{
+			"ResourcePost",
+			http.MethodPost,
+			"/resource",
+			ResourcePost,
+		},
+	}
 }

@@ -6,17 +6,21 @@ import (
 	"net/http"
 )
 
-type InfoHandler struct {
+type InfoHandler interface {
+	GetInfo(c *gin.Context)
+}
+
+type InfoHandlerImpl struct {
 	infoService service.InfoService
 }
 
-func NewInfoHandler(infoService service.InfoService) *InfoHandler {
-	return &InfoHandler{
+func NewInfoHandler(infoService service.InfoService) *InfoHandlerImpl {
+	return &InfoHandlerImpl{
 		infoService: infoService,
 	}
 }
 
-func (handler *InfoHandler) GetInfo(c *gin.Context) {
+func (handler *InfoHandlerImpl) GetInfo(c *gin.Context) {
 	info := handler.infoService.GetInfo()
 	c.JSON(http.StatusOK, info)
 }

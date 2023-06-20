@@ -33,6 +33,7 @@ func TestGetInfo(t *testing.T) {
 	}
 
 	handler.GetInfo(context)
+
 	var err = json.Unmarshal(recorder.Body.Bytes(), &infoDto)
 
 	assert.Nil(t, err)

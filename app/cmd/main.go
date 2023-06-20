@@ -17,7 +17,7 @@ import (
 func main() {
 	log.Printf("Server started")
 
-	router := sw.NewRouter()
+	router := sw.NewRouter(nil)
 	_ = router.SetTrustedProxies(nil)
 
 	log.Fatal(router.Run(":8080"))
