@@ -15,11 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// ResourceGet -
-func ResourceGet(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{})
-}
-
 // ResourceIdGet -
 func ResourceIdGet(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})

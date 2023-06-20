@@ -9,35 +9,65 @@ import (
 	"testing"
 )
 
-type infoHandlerMock struct {
-}
-
-func (infoHandler *infoHandlerMock) GetInfo(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, &response)
-}
-
 type responseMock struct {
 	Text string `json:"Text"`
 }
 
 var response responseMock
+
+type infoHandlerMock struct{}
+type resourceHandlerMock struct{}
+
+func createResponse(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, &response)
+}
+
+func (infoHandler *infoHandlerMock) GetInfo(ctx *gin.Context) {
+	createResponse(ctx)
+}
+
+func (resourceHandler *resourceHandlerMock) GetResources(ctx *gin.Context) {
+	createResponse(ctx)
+}
+
 var infoHandler = infoHandlerMock{}
+var resourceHandler = resourceHandlerMock{}
 
-var router = NewRouter(&infoHandler)
+var router = NewRouter(&infoHandler, &resourceHandler)
 
-func TestRouters(t *testing.T) {
+func TestInfoGet(t *testing.T) {
 	var infoResponse responseMock
 	response = responseMock{
 		Text: "getInfo",
 	}
 
-	recorder := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/info", nil)
-	router.ServeHTTP(recorder, req)
+	recorder := doRequest("GET", "/info")
 
 	err := json.Unmarshal(recorder.Body.Bytes(), &infoResponse)
 
 	assert.Nil(t, err)
 	assert.NotEmpty(t, infoResponse)
 	assert.Equal(t, "getInfo", infoResponse.Text)
+}
+
+func TestResourceGet(t *testing.T) {
+	var getAllResourcesResponse responseMock
+	response = responseMock{
+		Text: "getAllResources",
+	}
+
+	recorder := doRequest("GET", "/resource")
+
+	err := json.Unmarshal(recorder.Body.Bytes(), &getAllResourcesResponse)
+
+	assert.Nil(t, err)
+	assert.NotEmpty(t, getAllResourcesResponse)
+	assert.Equal(t, "getAllResources", getAllResourcesResponse.Text)
+}
+
+func doRequest(method string, url string) *httptest.ResponseRecorder {
+	recorder := httptest.NewRecorder()
+	req, _ := http.NewRequest(method, url, nil)
+	router.ServeHTTP(recorder, req)
+	return recorder
 }

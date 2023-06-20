@@ -1,10 +1,11 @@
-package service
+package test
 
 import (
+	"github.com/stefnef/Flowingo/m/internal/core/service"
 	"testing"
 )
 
-var infoService = NewInfoService()
+var infoService = service.NewInfoService()
 
 func TestGetInfo(t *testing.T) {
 

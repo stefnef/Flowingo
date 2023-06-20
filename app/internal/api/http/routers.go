@@ -32,9 +32,10 @@ type Route struct {
 type Routes []Route
 
 // NewRouter returns a new router.
-func NewRouter(infoHandler handler.InfoHandler) *gin.Engine {
+func NewRouter(infoHandler handler.InfoHandler, resourceHandler handler.ResourceHandler) *gin.Engine {
 	router := gin.Default()
-	routes := getRoutes(infoHandler)
+	routes := getRoutes(infoHandler, resourceHandler)
+
 	for _, route := range routes {
 		switch route.Method {
 		case http.MethodGet:
@@ -58,7 +59,7 @@ func Index(c *gin.Context) {
 	c.String(http.StatusOK, "Hello World!")
 }
 
-func getRoutes(infoHandler handler.InfoHandler) Routes {
+func getRoutes(infoHandler handler.InfoHandler, resourceHandler handler.ResourceHandler) Routes {
 	return Routes{
 		{
 			"Index",
@@ -78,7 +79,7 @@ func getRoutes(infoHandler handler.InfoHandler) Routes {
 			"ResourceGet",
 			http.MethodGet,
 			"/resource",
-			ResourceGet,
+			resourceHandler.GetResources,
 		},
 
 		{

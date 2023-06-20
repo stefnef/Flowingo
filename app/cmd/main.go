@@ -19,10 +19,10 @@ import (
 func main() {
 	log.Printf("Server started")
 
-	var infoService = service.NewInfoService()
-	var infoHandler = handler.NewInfoHandler(infoService)
+	var infoHandler = handler.NewInfoHandler(service.NewInfoService())
+	var resourceHandler = handler.NewResourceHandler(service.NewResourceService())
 
-	router := sw.NewRouter(infoHandler)
+	router := sw.NewRouter(infoHandler, resourceHandler)
 	_ = router.SetTrustedProxies(nil)
 
 	log.Fatal(router.Run(":8080"))

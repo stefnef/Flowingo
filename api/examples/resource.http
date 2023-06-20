@@ -1,0 +1,5 @@
+### Get resources
+GET {{server}}/resource
+
+### Get Resource Id
+GET {{server}}/resource/{{resourceId}}
