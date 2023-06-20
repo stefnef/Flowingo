@@ -13,26 +13,26 @@ type infoHandlerMock struct {
 }
 
 func (infoHandler *infoHandlerMock) GetInfo(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, &responseMock{
-		Text: "getInfo",
-	})
+	ctx.JSON(http.StatusOK, &response)
 }
 
 type responseMock struct {
 	Text string `json:"Text"`
 }
 
-func TestRouters(t *testing.T) {
-	gin.SetMode(gin.TestMode)
+var response responseMock
+var infoHandler = infoHandlerMock{}
 
-	infoHandler := infoHandlerMock{}
-	router := NewRouter(&infoHandler)
+var router = NewRouter(&infoHandler)
+
+func TestRouters(t *testing.T) {
+	var infoResponse responseMock
+	response = responseMock{
+		Text: "getInfo",
+	}
 
 	recorder := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/info", nil)
-
-	var infoResponse responseMock
-
 	router.ServeHTTP(recorder, req)
 
 	err := json.Unmarshal(recorder.Body.Bytes(), &infoResponse)

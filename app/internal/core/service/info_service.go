@@ -9,6 +9,10 @@ type InfoService interface {
 type InfoServiceImpl struct {
 }
 
+func NewInfoService() InfoService {
+	return &InfoServiceImpl{}
+}
+
 func (service InfoServiceImpl) GetInfo() *domain.Info {
 	return &domain.Info{
 		Text: "Example Resource Server",

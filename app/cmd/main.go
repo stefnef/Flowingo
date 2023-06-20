@@ -11,13 +11,18 @@ package main
 
 import (
 	sw "github.com/stefnef/Flowingo/m/internal/api/http"
+	"github.com/stefnef/Flowingo/m/internal/api/http/handler"
+	"github.com/stefnef/Flowingo/m/internal/core/service"
 	"log"
 )
 
 func main() {
 	log.Printf("Server started")
 
-	router := sw.NewRouter(nil)
+	var infoService = service.NewInfoService()
+	var infoHandler = handler.NewInfoHandler(infoService)
+
+	router := sw.NewRouter(infoHandler)
 	_ = router.SetTrustedProxies(nil)
 
 	log.Fatal(router.Run(":8080"))

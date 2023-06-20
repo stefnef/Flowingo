@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-var infoService = &InfoServiceImpl{}
+var infoService = NewInfoService()
 
 func TestGetInfo(t *testing.T) {
 
