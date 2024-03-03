@@ -20,7 +20,7 @@ func NewInfoHandler(infoService service.InfoService) *InfoHandlerImpl {
 	}
 }
 
-func (handler *InfoHandlerImpl) GetInfo(c *gin.Context) {
+func (handler *InfoHandlerImpl) GetInfo(context *gin.Context) {
 	info := handler.infoService.GetInfo()
-	c.JSON(http.StatusOK, info)
+	context.JSON(http.StatusOK, info)
 }

@@ -30,6 +30,10 @@ func (resourceHandler *resourceHandlerMock) GetResources(ctx *gin.Context) {
 	createResponse(ctx)
 }
 
+func (resourceHandler *resourceHandlerMock) GetResource(ctx *gin.Context) {
+	createResponse(ctx)
+}
+
 var infoHandler = infoHandlerMock{}
 var resourceHandler = resourceHandlerMock{}
 
@@ -63,6 +67,21 @@ func TestResourceGet(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEmpty(t, getAllResourcesResponse)
 	assert.Equal(t, "getAllResources", getAllResourcesResponse.Text)
+}
+
+func TestResourceGetSingle(t *testing.T) {
+	var getSingleResourcesResponse responseMock
+	response = responseMock{
+		Text: "getResource",
+	}
+
+	recorder := doRequest("GET", "/resource/some-id")
+
+	err := json.Unmarshal(recorder.Body.Bytes(), &getSingleResourcesResponse)
+
+	assert.Nil(t, err)
+	assert.NotEmpty(t, getSingleResourcesResponse)
+	assert.Equal(t, "getResource", getSingleResourcesResponse.Text)
 }
 
 func doRequest(method string, url string) *httptest.ResponseRecorder {

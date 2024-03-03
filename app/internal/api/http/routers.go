@@ -86,7 +86,7 @@ func getRoutes(infoHandler handler.InfoHandler, resourceHandler handler.Resource
 			"ResourceIdGet",
 			http.MethodGet,
 			"/resource/:id",
-			ResourceIdGet,
+			resourceHandler.GetResource,
 		},
 
 		{
