@@ -31,10 +31,10 @@ func TestGetResources(t *testing.T) {
 
 func TestGetResource(t *testing.T) {
 	var expectedResource = resourceData[0]
-	var resource = resourceService.GetResource("some-id")
+	var resource, _ = resourceService.GetResource("some-id")
 
 	assert.NotNil(t, resource)
-	assert.Equal(t, expectedResource, resource)
+	assert.Equal(t, expectedResource, *resource)
 }
 
 func TestResourceServiceImpl_GetResource(t *testing.T) {
@@ -53,8 +53,17 @@ func TestResourceServiceImpl_GetResource(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.id, func(t *testing.T) {
-			act := resourceService.GetResource(tt.id)
-			assert.Equal(t, tt.want, act)
+			act, err := resourceService.GetResource(tt.id)
+			assert.Equal(t, tt.want, *act)
+			assert.Nil(t, err)
 		})
 	}
+}
+
+func TestResourceServiceImpl_GetResource_throws(t *testing.T) {
+	element, err := resourceService.GetResource("i-do-not-exist")
+	assert.Nil(t, element)
+	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, domain.NotFoundError)
+	assert.ErrorContains(t, err, "not found: Resource with id 'i-do-not-exist'")
 }

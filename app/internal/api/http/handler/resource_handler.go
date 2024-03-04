@@ -23,7 +23,7 @@ func (handler *ResourceHandlerImpl) GetResource(context *gin.Context) {
 		return
 	}
 
-	resource := handler.resourceService.GetResource(id)
+	resource, _ := handler.resourceService.GetResource(id)
 	context.JSON(http.StatusOK, resource)
 }
 

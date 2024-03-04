@@ -1,10 +1,13 @@
 package service
 
-import "github.com/stefnef/Flowingo/m/internal/core/domain"
+import (
+	"fmt"
+	"github.com/stefnef/Flowingo/m/internal/core/domain"
+)
 
 type ResourceService interface {
 	GetResources() []domain.Resource
-	GetResource(id string) domain.Resource
+	GetResource(id string) (*domain.Resource, error)
 }
 
 type ResourceServiceImpl struct {
@@ -23,14 +26,14 @@ var resources = []domain.Resource{
 	},
 }
 
-func (r *ResourceServiceImpl) GetResource(id string) domain.Resource {
+func (r *ResourceServiceImpl) GetResource(id string) (*domain.Resource, error) {
 	for _, resource := range resources {
 		if id == resource.Id {
-			return resource
+			return &resource, nil
 		}
 	}
 	//TODO handle notFound error
-	return resources[0]
+	return nil, fmt.Errorf("%w: Resource with id '%s'", domain.NotFoundError, id)
 }
 
 func (r *ResourceServiceImpl) GetResources() []domain.Resource {
