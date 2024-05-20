@@ -13,14 +13,16 @@ import (
 	sw "github.com/stefnef/Flowingo/m/internal/api/http"
 	"github.com/stefnef/Flowingo/m/internal/api/http/handler"
 	"github.com/stefnef/Flowingo/m/internal/core/service"
+	"github.com/stefnef/Flowingo/m/internal/repository"
 	"log"
 )
 
 func main() {
 	log.Printf("Server started")
 
+	var resourceRepository = repository.NewInternalResourceRepository()
 	var infoHandler = handler.NewInfoHandler(service.NewInfoService())
-	var resourceHandler = handler.NewResourceHandler(service.NewResourceService(nil))
+	var resourceHandler = handler.NewResourceHandler(service.NewResourceService(resourceRepository))
 
 	router := sw.NewRouter(infoHandler, resourceHandler)
 	_ = router.SetTrustedProxies(nil)
