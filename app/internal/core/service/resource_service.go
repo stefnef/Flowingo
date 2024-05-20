@@ -1,28 +1,27 @@
 package service
 
 import (
-	"fmt"
 	"github.com/stefnef/Flowingo/m/internal/core/domain"
 	"github.com/stefnef/Flowingo/m/internal/repository"
 )
 
 type ResourceService interface {
 	GetResources() []domain.Resource
-	GetResource(id string) (*domain.Resource, error)
+	GetResource(id string) *domain.Resource
 }
 
 type ResourceServiceImpl struct {
 	resourceRepository repository.ResourceRepository
 }
 
-func (r *ResourceServiceImpl) GetResource(id string) (*domain.Resource, error) {
+func (r *ResourceServiceImpl) GetResource(id string) *domain.Resource {
 	var resource, err = r.resourceRepository.GetResourceById(id)
 
 	if err != nil {
-		panic(fmt.Errorf("%w: Resource with id '%s'", domain.NotFoundError, id))
+		panic(err)
 	}
 
-	return resource, nil
+	return resource
 }
 
 func (r *ResourceServiceImpl) GetResources() []domain.Resource {

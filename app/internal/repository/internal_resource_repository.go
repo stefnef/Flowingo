@@ -29,7 +29,7 @@ func (i InternalResourceRepositoryImpl) GetResourceById(id string) (*domain.Reso
 			return &resource, nil
 		}
 	}
-	return nil, domain.NotFoundError
+	return nil, domain.NewNotFoundError("resource", id)
 }
 
 func NewInternalResourceRepository() ResourceRepository {

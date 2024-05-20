@@ -15,7 +15,7 @@ type ResourceServiceMock struct {
 }
 
 var getResources func() []domain.Resource
-var getResource func() (*domain.Resource, error)
+var getResource func() *domain.Resource
 
 func (service *ResourceServiceMock) GetResources() []domain.Resource {
 	return getResources()
@@ -29,7 +29,7 @@ func (service *ResourceServiceMock) recordFunctionCall(function string, paramete
 	}
 }
 
-func (service *ResourceServiceMock) GetResource(id string) (*domain.Resource, error) {
+func (service *ResourceServiceMock) GetResource(id string) *domain.Resource {
 	service.recordFunctionCall(functionGetResource, "id", id)
 	return getResource()
 }
@@ -91,12 +91,12 @@ func doTestGetResource(t *testing.T, paramId string, expectedParamId string) {
 		MagicNumber: 21,
 	}
 
-	getResource = func() (*domain.Resource, error) {
+	getResource = func() *domain.Resource {
 		return &domain.Resource{
 			Id:          expectedParamId,
 			Name:        "Name",
 			MagicNumber: 21,
-		}, nil
+		}
 	}
 
 	resourceHandler.GetResource(context)

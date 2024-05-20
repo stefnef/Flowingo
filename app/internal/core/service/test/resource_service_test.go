@@ -53,11 +53,11 @@ func TestGetResource(t *testing.T) {
 		if id == "some-id" {
 			return &expectedResource, nil
 		} else {
-			return nil, domain.NotFoundError
+			return nil, domain.NewNotFoundError("resource", id)
 		}
 	}
 
-	var resource, _ = resourceService.GetResource("some-id")
+	var resource = resourceService.GetResource("some-id")
 
 	assert.NotNil(t, resource)
 	assert.Equal(t, expectedResource, *resource)
@@ -65,10 +65,10 @@ func TestGetResource(t *testing.T) {
 
 func TestResourceServiceImpl_GetResource_throws(t *testing.T) {
 	getResourceById = func(id string) (*domain.Resource, error) {
-		return nil, domain.NotFoundError
+		return nil, domain.NewNotFoundError("resource", id)
 	}
 
-	assert.PanicsWithError(t, "not found: Resource with id 'i-do-not-exist'", func() {
-		_, _ = resourceService.GetResource("i-do-not-exist")
+	assert.PanicsWithError(t, "could not find resource 'resource' with id 'i-do-not-exist'", func() {
+		_ = resourceService.GetResource("i-do-not-exist")
 	})
 }

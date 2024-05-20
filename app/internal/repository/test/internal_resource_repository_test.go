@@ -69,5 +69,5 @@ func TestResourceRepositoryImpl_GetResource_throws(t *testing.T) {
 	element, err := resourceRepository.GetResourceById("i-do-not-exist")
 	assert.Nil(t, element)
 	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, domain.NotFoundError)
+	assert.ErrorContains(t, err, "could not find resource 'resource' with id 'i-do-not-exist'")
 }
