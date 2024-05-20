@@ -7,22 +7,36 @@ import (
 	"testing"
 )
 
-var resourceService = service.NewResourceService()
-var resourceData = []domain.Resource{
-	{
-		Id:          "some-id",
-		Name:        "Some Name",
-		MagicNumber: 41,
-	},
-	{
-		Id:          "some-other-id",
-		Name:        "Some Other Name",
-		MagicNumber: 37,
-	},
+type ResourceRepositoryMock struct{}
+
+var getResources func() []domain.Resource
+var getResourceById func(id string) (*domain.Resource, error)
+
+func (repository *ResourceRepositoryMock) GetResources() []domain.Resource {
+	return getResources()
+}
+func (repository *ResourceRepositoryMock) GetResourceById(id string) (*domain.Resource, error) {
+	return getResourceById(id)
 }
 
+var resourceRepository = &ResourceRepositoryMock{}
+var resourceService = service.NewResourceService(resourceRepository)
+
 func TestGetResources(t *testing.T) {
-	var expectedResources = resourceData
+	var expectedResources = []domain.Resource{
+		{
+			Id:          "some-id",
+			Name:        "Some Name",
+			MagicNumber: 41,
+		},
+		{
+			Id:          "some-other-id",
+			Name:        "Some Other Name",
+			MagicNumber: 37,
+		},
+	}
+	getResources = func() []domain.Resource { return expectedResources }
+
 	var resources = resourceService.GetResources()
 
 	assert.NotNil(t, resources)
@@ -30,40 +44,31 @@ func TestGetResources(t *testing.T) {
 }
 
 func TestGetResource(t *testing.T) {
-	var expectedResource = resourceData[0]
+	var expectedResource = domain.Resource{
+		Id:          "some-id",
+		Name:        "Something's Name",
+		MagicNumber: 41,
+	}
+	getResourceById = func(id string) (*domain.Resource, error) {
+		if id == "some-id" {
+			return &expectedResource, nil
+		} else {
+			return nil, domain.NotFoundError
+		}
+	}
+
 	var resource, _ = resourceService.GetResource("some-id")
 
 	assert.NotNil(t, resource)
 	assert.Equal(t, expectedResource, *resource)
 }
 
-func TestResourceServiceImpl_GetResource(t *testing.T) {
-	tests := []struct {
-		id   string
-		want domain.Resource
-	}{
-		{
-			id:   "some-id",
-			want: resourceData[0],
-		},
-		{
-			id:   "some-other-id",
-			want: resourceData[1],
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.id, func(t *testing.T) {
-			act, err := resourceService.GetResource(tt.id)
-			assert.Equal(t, tt.want, *act)
-			assert.Nil(t, err)
-		})
-	}
-}
-
 func TestResourceServiceImpl_GetResource_throws(t *testing.T) {
-	element, err := resourceService.GetResource("i-do-not-exist")
-	assert.Nil(t, element)
-	assert.NotNil(t, err)
-	assert.ErrorIs(t, err, domain.NotFoundError)
-	assert.ErrorContains(t, err, "not found: Resource with id 'i-do-not-exist'")
+	getResourceById = func(id string) (*domain.Resource, error) {
+		return nil, domain.NotFoundError
+	}
+
+	assert.PanicsWithError(t, "not found: Resource with id 'i-do-not-exist'", func() {
+		_, _ = resourceService.GetResource("i-do-not-exist")
+	})
 }

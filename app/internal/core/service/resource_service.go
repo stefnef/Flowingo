@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/stefnef/Flowingo/m/internal/core/domain"
+	"github.com/stefnef/Flowingo/m/internal/repository"
 )
 
 type ResourceService interface {
@@ -11,35 +12,25 @@ type ResourceService interface {
 }
 
 type ResourceServiceImpl struct {
-}
-
-var resources = []domain.Resource{
-	{
-		Id:          "some-id",
-		Name:        "Some Name",
-		MagicNumber: 41,
-	},
-	{
-		Id:          "some-other-id",
-		Name:        "Some Other Name",
-		MagicNumber: 37,
-	},
+	resourceRepository repository.ResourceRepository
 }
 
 func (r *ResourceServiceImpl) GetResource(id string) (*domain.Resource, error) {
-	for _, resource := range resources {
-		if id == resource.Id {
-			return &resource, nil
-		}
+	var resource, err = r.resourceRepository.GetResourceById(id)
+
+	if err != nil {
+		panic(fmt.Errorf("%w: Resource with id '%s'", domain.NotFoundError, id))
 	}
-	//TODO handle notFound error
-	return nil, fmt.Errorf("%w: Resource with id '%s'", domain.NotFoundError, id)
+
+	return resource, nil
 }
 
 func (r *ResourceServiceImpl) GetResources() []domain.Resource {
-	return resources
+	return r.resourceRepository.GetResources()
 }
 
-func NewResourceService() ResourceService {
-	return &ResourceServiceImpl{}
+func NewResourceService(resourceRepository repository.ResourceRepository) ResourceService {
+	return &ResourceServiceImpl{
+		resourceRepository: resourceRepository,
+	}
 }

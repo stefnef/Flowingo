@@ -20,7 +20,7 @@ func main() {
 	log.Printf("Server started")
 
 	var infoHandler = handler.NewInfoHandler(service.NewInfoService())
-	var resourceHandler = handler.NewResourceHandler(service.NewResourceService())
+	var resourceHandler = handler.NewResourceHandler(service.NewResourceService(nil))
 
 	router := sw.NewRouter(infoHandler, resourceHandler)
 	_ = router.SetTrustedProxies(nil)
