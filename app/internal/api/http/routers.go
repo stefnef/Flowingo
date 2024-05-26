@@ -20,7 +20,7 @@ import (
 type Route struct {
 	// Name is the name of this Route.
 	Name string
-	// Method is the string for the HTTP method. ex) GET, POST etc..
+	// Method is the string for the HTTP method. examples GET, POST etc.
 	Method string
 	// Pattern is the pattern of the URI.
 	Pattern string
@@ -32,14 +32,14 @@ type Route struct {
 type Routes []Route
 
 // NewRouter returns a new router.
-func NewRouter(infoHandler handler.InfoHandler, resourceHandler handler.ResourceHandler) *gin.Engine {
+func NewRouter(infoHandler handler.InfoHandler, resourceHandler handler.ResourceHandler, errorHandler handler.ErrorHandler) *gin.Engine {
 	router := gin.Default()
 	routes := getRoutes(infoHandler, resourceHandler)
 
 	for _, route := range routes {
 		switch route.Method {
 		case http.MethodGet:
-			router.GET(route.Pattern, route.HandlerFunc)
+			router.GET(route.Pattern, errorHandler.HandleErrors, route.HandlerFunc)
 		case http.MethodPost:
 			router.POST(route.Pattern, route.HandlerFunc)
 		case http.MethodPut:

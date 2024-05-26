@@ -23,8 +23,9 @@ func main() {
 	var resourceRepository = repository.NewInternalResourceRepository()
 	var infoHandler = handler.NewInfoHandler(service.NewInfoService())
 	var resourceHandler = handler.NewResourceHandler(service.NewResourceService(resourceRepository))
+	var errorHandler = handler.NewErrorHandler()
 
-	router := sw.NewRouter(infoHandler, resourceHandler)
+	router := sw.NewRouter(infoHandler, resourceHandler, errorHandler)
 	_ = router.SetTrustedProxies(nil)
 
 	log.Fatal(router.Run(":8080"))

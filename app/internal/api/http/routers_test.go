@@ -17,33 +17,38 @@ var response responseMock
 
 type infoHandlerMock struct{}
 type resourceHandlerMock struct{}
+type errorHandlerMock struct{}
 
-func createResponse(ctx *gin.Context) {
+func (infoHandler *infoHandlerMock) GetInfo(ctx *gin.Context) {
+	response.Text += "GetInfo"
 	ctx.JSON(http.StatusOK, &response)
 }
 
-func (infoHandler *infoHandlerMock) GetInfo(ctx *gin.Context) {
-	createResponse(ctx)
-}
-
 func (resourceHandler *resourceHandlerMock) GetResources(ctx *gin.Context) {
-	createResponse(ctx)
+	response.Text += "GetResources"
+	ctx.JSON(http.StatusOK, &response)
 }
 
 func (resourceHandler *resourceHandlerMock) GetResource(ctx *gin.Context) {
-	createResponse(ctx)
+	response.Text += "ResourceGetSingle"
+	ctx.JSON(http.StatusOK, &response)
 }
 
-var infoHandler = infoHandlerMock{}
-var resourceHandler = resourceHandlerMock{}
+func (errorHandler *errorHandlerMock) HandleErrors(ctx *gin.Context) {
+	response.Text = "errorHandling -> "
+	ctx.Next()
+}
 
-var router = NewRouter(&infoHandler, &resourceHandler)
+var (
+	infoHandler     = infoHandlerMock{}
+	resourceHandler = resourceHandlerMock{}
+	errorHandler    = errorHandlerMock{}
+)
+
+var router = NewRouter(&infoHandler, &resourceHandler, &errorHandler)
 
 func TestInfoGet(t *testing.T) {
 	var infoResponse responseMock
-	response = responseMock{
-		Text: "getInfo",
-	}
 
 	recorder := doRequest("GET", "/info")
 
@@ -51,14 +56,11 @@ func TestInfoGet(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotEmpty(t, infoResponse)
-	assert.Equal(t, "getInfo", infoResponse.Text)
+	assert.Equal(t, "errorHandling -> GetInfo", infoResponse.Text)
 }
 
 func TestResourceGet(t *testing.T) {
 	var getAllResourcesResponse responseMock
-	response = responseMock{
-		Text: "getAllResources",
-	}
 
 	recorder := doRequest("GET", "/resource")
 
@@ -66,22 +68,18 @@ func TestResourceGet(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotEmpty(t, getAllResourcesResponse)
-	assert.Equal(t, "getAllResources", getAllResourcesResponse.Text)
+	assert.Equal(t, "errorHandling -> GetResources", getAllResourcesResponse.Text)
 }
 
 func TestResourceGetSingle(t *testing.T) {
 	var getSingleResourcesResponse responseMock
-	response = responseMock{
-		Text: "getResource",
-	}
-
 	recorder := doRequest("GET", "/resource/some-id")
 
 	err := json.Unmarshal(recorder.Body.Bytes(), &getSingleResourcesResponse)
 
 	assert.Nil(t, err)
 	assert.NotEmpty(t, getSingleResourcesResponse)
-	assert.Equal(t, "getResource", getSingleResourcesResponse.Text)
+	assert.Equal(t, "errorHandling -> ResourceGetSingle", getSingleResourcesResponse.Text)
 }
 
 func doRequest(method string, url string) *httptest.ResponseRecorder {

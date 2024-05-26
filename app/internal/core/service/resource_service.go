@@ -18,7 +18,7 @@ func (r *ResourceServiceImpl) GetResource(id string) *domain.Resource {
 	var resource, err = r.resourceRepository.GetResourceById(id)
 
 	if err != nil {
-		panic(err)
+		panic(err) //TODO catch panic
 	}
 
 	return resource
