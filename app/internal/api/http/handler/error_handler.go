@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"context"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type ErrorHandler interface {
@@ -12,8 +12,10 @@ type ErrorHandler interface {
 type ErrorHandlerImpl struct {
 }
 
-func (errorHandler *ErrorHandlerImpl) HandleErrors(ctx *gin.Context) {
-	context.TODO()
+func (errorHandler *ErrorHandlerImpl) HandleErrors(context *gin.Context) {
+	for _, _ = range context.Errors {
+		context.AbortWithStatus(http.StatusNotFound)
+	}
 }
 
 func NewErrorHandler() *ErrorHandlerImpl {
