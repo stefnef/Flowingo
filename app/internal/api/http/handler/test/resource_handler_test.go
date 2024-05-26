@@ -15,7 +15,7 @@ type ResourceServiceMock struct {
 }
 
 var getResources func() []domain.Resource
-var getResource func() *domain.Resource
+var getResource func() (*domain.Resource, error)
 
 func (service *ResourceServiceMock) GetResources() []domain.Resource {
 	return getResources()
@@ -29,7 +29,7 @@ func (service *ResourceServiceMock) recordFunctionCall(function string, paramete
 	}
 }
 
-func (service *ResourceServiceMock) GetResource(id string) *domain.Resource {
+func (service *ResourceServiceMock) GetResource(id string) (*domain.Resource, error) {
 	service.recordFunctionCall(functionGetResource, "id", id)
 	return getResource()
 }
@@ -70,7 +70,7 @@ func TestResourceHandlerImpl_GetResources(t *testing.T) {
 	assert.Equal(t, expectedDto, resourcesDto)
 }
 
-func TestResourceHandlerImpl_GetResource_on_missing_id(t *testing.T) {
+func TestResourceHandlerImpl_GetResource_on_missing_parameter_id(t *testing.T) {
 	initResourceHandlerSlot(t)
 	var context, recorder = GetTestGinContext()
 
@@ -78,6 +78,25 @@ func TestResourceHandlerImpl_GetResource_on_missing_id(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, recorder.Code)
 	resourceService.slot.verifyFunctionNotCalled(functionGetResource)
+}
+
+func TestResourceHandlerImpl_GetResource_error_on_missing_resource(t *testing.T) {
+	initResourceHandlerSlot(t)
+	var context, recorder = GetTestGinContext()
+	id := "fake-id"
+	context.AddParam("id", id)
+	recorder.Code = 123
+	notFoundError := domain.NewNotFoundError("fake", id)
+
+	getResource = func() (*domain.Resource, error) {
+		return nil, notFoundError
+	}
+
+	resourceHandler.GetResource(context)
+	assert.NotEmpty(t, context.Errors)
+	assert.Len(t, context.Errors, 1)
+	assert.Equal(t, notFoundError, (*context.Errors[0]).Err)
+	assert.Equal(t, 123, recorder.Code)
 }
 
 func doTestGetResource(t *testing.T, paramId string, expectedParamId string) {
@@ -91,12 +110,12 @@ func doTestGetResource(t *testing.T, paramId string, expectedParamId string) {
 		MagicNumber: 21,
 	}
 
-	getResource = func() *domain.Resource {
+	getResource = func() (*domain.Resource, error) {
 		return &domain.Resource{
 			Id:          expectedParamId,
 			Name:        "Name",
 			MagicNumber: 21,
-		}
+		}, nil
 	}
 
 	resourceHandler.GetResource(context)

@@ -7,21 +7,21 @@ import (
 
 type ResourceService interface {
 	GetResources() []domain.Resource
-	GetResource(id string) *domain.Resource
+	GetResource(id string) (*domain.Resource, error)
 }
 
 type ResourceServiceImpl struct {
 	resourceRepository repository.ResourceRepository
 }
 
-func (r *ResourceServiceImpl) GetResource(id string) *domain.Resource {
+func (r *ResourceServiceImpl) GetResource(id string) (*domain.Resource, error) {
 	var resource, err = r.resourceRepository.GetResourceById(id)
 
 	if err != nil {
-		panic(err) //TODO catch panic
+		return nil, err
 	}
 
-	return resource
+	return resource, nil
 }
 
 func (r *ResourceServiceImpl) GetResources() []domain.Resource {

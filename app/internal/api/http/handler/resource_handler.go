@@ -23,8 +23,12 @@ func (handler *ResourceHandlerImpl) GetResource(context *gin.Context) {
 		return
 	}
 
-	resource := handler.resourceService.GetResource(id)
-	context.JSON(http.StatusOK, resource)
+	resource, err := handler.resourceService.GetResource(id)
+	if err != nil {
+		_ = context.Error(err)
+	} else {
+		context.JSON(http.StatusOK, resource)
+	}
 }
 
 func (handler *ResourceHandlerImpl) GetResources(context *gin.Context) {
