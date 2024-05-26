@@ -14,18 +14,25 @@ type ErrorHandler interface {
 type ErrorHandlerImpl struct {
 }
 
+func NewErrorHandler() *ErrorHandlerImpl {
+	return &ErrorHandlerImpl{}
+}
+
 func (errorHandler *ErrorHandlerImpl) HandleErrors(context *gin.Context) {
+	context.Next()
+
+	errorHandler.handleError(context)
+}
+
+func (errorHandler *ErrorHandlerImpl) handleError(context *gin.Context) {
 	for _, err := range context.Errors {
 		var notFoundError *domain.NotFoundError
 		switch {
 		case errors.As(err.Err, &notFoundError):
 			context.AbortWithStatusJSON(http.StatusNotFound, err.JSON())
 		default:
-			context.AbortWithStatusJSON(http.StatusInternalServerError, map[string]string{"error": "internal server error"})
+			internalServerError := map[string]string{"error": "internal server error"}
+			context.AbortWithStatusJSON(http.StatusInternalServerError, internalServerError)
 		}
 	}
-}
-
-func NewErrorHandler() *ErrorHandlerImpl {
-	return &ErrorHandlerImpl{}
 }

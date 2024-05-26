@@ -2,6 +2,7 @@ package handler_test
 
 import (
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 	"github.com/stefnef/Flowingo/m/internal/api/http/handler"
 	"github.com/stefnef/Flowingo/m/internal/core/domain"
@@ -14,6 +15,18 @@ var errorHandler = handler.NewErrorHandler()
 
 func Test_should_implement_interface(t *testing.T) {
 	assert.Implements(t, (*handler.ErrorHandler)(nil), errorHandler)
+}
+
+func Test_it_should_call_next_before_error_handling(t *testing.T) {
+	var _, recorder, engine = GetTestGinEngine()
+	var getHandler = func(context *gin.Context) {
+		_ = context.Error(errors.New("here is some error"))
+	}
+	engine.GET("/", errorHandler.HandleErrors, getHandler)
+	req, _ := http.NewRequest("GET", "/", nil)
+
+	engine.ServeHTTP(recorder, req)
+	assert.Equal(t, http.StatusInternalServerError, recorder.Code)
 }
 
 func Test_should_do_nothing_if_there_is_no_error(t *testing.T) {
