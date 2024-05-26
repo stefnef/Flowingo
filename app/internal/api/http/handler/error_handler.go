@@ -13,7 +13,7 @@ type ErrorHandlerImpl struct {
 }
 
 func (errorHandler *ErrorHandlerImpl) HandleErrors(context *gin.Context) {
-	for _, _ = range context.Errors {
+	for range context.Errors {
 		context.AbortWithStatus(http.StatusNotFound)
 	}
 }
