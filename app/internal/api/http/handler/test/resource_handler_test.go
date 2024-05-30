@@ -151,3 +151,15 @@ func Test_GetResource(t *testing.T) {
 		})
 	}
 }
+
+func TestResourceHandler_error_on_missing_param_name(t *testing.T) {
+	var context, recorder = GetTestGinContext()
+	recorder.Code = 000
+
+	resourceHandler.PostResource(context)
+
+	assert.NotEmpty(t, context.Errors)
+	assert.Equal(t, 000, recorder.Code)
+	assert.Len(t, context.Errors, 1)
+	assert.Equal(t, "name is missing", (*context.Errors[0]).Err.Error())
+}
