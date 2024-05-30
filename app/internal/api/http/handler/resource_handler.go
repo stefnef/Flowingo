@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/stefnef/Flowingo/m/internal/core/service"
 	"net/http"
@@ -38,8 +37,17 @@ func (handler *ResourceHandlerImpl) GetResources(context *gin.Context) {
 	context.JSON(http.StatusOK, resources)
 }
 
+type some struct {
+	Name string `json:"name"`
+}
+
 func (handler *ResourceHandlerImpl) PostResource(context *gin.Context) {
-	_ = context.Error(errors.New("name is missing"))
+	var request some
+	err := context.BindJSON(request)
+	if err != nil {
+		return
+	}
+	//TODO hier weiter
 	//context.JSON(http.StatusOK)
 }
 
