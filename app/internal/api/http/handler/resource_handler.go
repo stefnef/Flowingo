@@ -10,6 +10,7 @@ import (
 type ResourceHandler interface {
 	GetResources(context *gin.Context)
 	GetResource(context *gin.Context)
+	PostResource(context *gin.Context)
 }
 
 type ResourceHandlerImpl struct {
@@ -34,6 +35,10 @@ func (handler *ResourceHandlerImpl) GetResource(context *gin.Context) {
 func (handler *ResourceHandlerImpl) GetResources(context *gin.Context) {
 	resources := handler.resourceService.GetResources()
 	context.JSON(http.StatusOK, resources)
+}
+
+func (handler *ResourceHandlerImpl) PostResource(context *gin.Context) {
+	//context.JSON(http.StatusOK)
 }
 
 func NewResourceHandler(resourceService service.ResourceService) *ResourceHandlerImpl {

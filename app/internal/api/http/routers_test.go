@@ -34,6 +34,11 @@ func (resourceHandler *resourceHandlerMock) GetResource(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &response)
 }
 
+func (resourceHandler *resourceHandlerMock) PostResource(ctx *gin.Context) {
+	response.Text += "ResourcePost"
+	ctx.JSON(http.StatusOK, &response)
+}
+
 func (errorHandler *errorHandlerMock) HandleErrors(ctx *gin.Context) {
 	response.Text = "errorHandling -> "
 	ctx.Next()
@@ -47,7 +52,12 @@ var (
 
 var router = NewRouter(&infoHandler, &resourceHandler, &errorHandler)
 
+func setup() {
+	response = responseMock{Text: ""}
+}
+
 func TestInfoGet(t *testing.T) {
+	setup()
 	var infoResponse responseMock
 
 	recorder := doRequest("GET", "/info")
@@ -60,6 +70,7 @@ func TestInfoGet(t *testing.T) {
 }
 
 func TestResourceGet(t *testing.T) {
+	setup()
 	var getAllResourcesResponse responseMock
 
 	recorder := doRequest("GET", "/resource")
@@ -72,6 +83,7 @@ func TestResourceGet(t *testing.T) {
 }
 
 func TestResourceGetSingle(t *testing.T) {
+	setup()
 	var getSingleResourcesResponse responseMock
 	recorder := doRequest("GET", "/resource/some-id")
 
@@ -80,6 +92,18 @@ func TestResourceGetSingle(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEmpty(t, getSingleResourcesResponse)
 	assert.Equal(t, "errorHandling -> ResourceGetSingle", getSingleResourcesResponse.Text)
+}
+
+func TestResourcePost(t *testing.T) {
+	setup()
+	var postSingleResourceResponse responseMock
+	recorder := doRequest("POST", "/resource")
+
+	err := json.Unmarshal(recorder.Body.Bytes(), &postSingleResourceResponse)
+
+	assert.Nil(t, err)
+	assert.NotEmpty(t, postSingleResourceResponse)
+	assert.Equal(t, "ResourcePost", postSingleResourceResponse.Text)
 }
 
 func doRequest(method string, url string) *httptest.ResponseRecorder {

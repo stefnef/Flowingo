@@ -93,7 +93,7 @@ func getRoutes(infoHandler handler.InfoHandler, resourceHandler handler.Resource
 			"ResourcePost",
 			http.MethodPost,
 			"/resource",
-			ResourcePost,
+			resourceHandler.PostResource,
 		},
 	}
 }
