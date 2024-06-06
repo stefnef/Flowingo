@@ -19,6 +19,7 @@ type ResourceServiceMock struct {
 
 var getResources func() []domain.Resource
 var getResource func() (*domain.Resource, error)
+var postResource func(resource *domain.Resource) (*domain.Resource, error)
 
 const functionGetResource = "GetResource"
 
@@ -35,6 +36,10 @@ func (service *ResourceServiceMock) GetResources() []domain.Resource {
 func (service *ResourceServiceMock) GetResource(id string) (*domain.Resource, error) {
 	service.recordFunctionCall(functionGetResource, "id", id)
 	return getResource()
+}
+
+func (service *ResourceServiceMock) PostResource(resource *domain.Resource) (*domain.Resource, error) {
+	return postResource(resource)
 }
 
 func initResourceHandlerSlot(t *testing.T) {
@@ -160,7 +165,7 @@ func TestResourceHandler_error_on_missing_param_name(t *testing.T) {
 	recorder.Code = 000
 	var requestBody = `{"i-do-not-exist":"1"}`
 
-	preparePost(context, "/resource/some-id", requestBody)
+	preparePost(context, "/resource", requestBody)
 	resourceHandler.PostResource(context)
 
 	assert.NotEmpty(t, context.Errors)
@@ -174,7 +179,7 @@ func TestResourceHandler_error_on_wrong_type_for_parameter_name(t *testing.T) {
 	var context, recorder = GetTestGinContext()
 	var requestBody = `{"name":1}`
 
-	preparePost(context, "/resource/some-id", requestBody)
+	preparePost(context, "/resource", requestBody)
 	resourceHandler.PostResource(context)
 
 	assert.NotEmpty(t, context.Errors)
@@ -185,12 +190,18 @@ func TestResourceHandler_should_delegate_to_service(t *testing.T) {
 	var context, recorder = GetTestGinContext()
 	var requestBody = `{"name":"some value"}`
 
-	preparePost(context, "/resource/some-id", requestBody)
+	postResource = func(resource *domain.Resource) (*domain.Resource, error) {
+		return resource, nil //TODO hier weiter, es muss ein unterschiedliches resource object sein
+	}
+
+	preparePost(context, "/resource", requestBody)
 	resourceHandler.PostResource(context)
 
 	assert.Empty(t, context.Errors)
 	assert.Equal(t, http.StatusCreated, recorder.Code)
 }
+
+//TODO add test: POST /resource/some-id should not work
 
 func preparePost(context *gin.Context, path string, content string) {
 	context.Request = httptest.NewRequest("POST", path, bytes.NewBuffer([]byte(content)))

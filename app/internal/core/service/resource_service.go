@@ -8,6 +8,7 @@ import (
 type ResourceService interface {
 	GetResources() []domain.Resource
 	GetResource(id string) (*domain.Resource, error)
+	PostResource(resource *domain.Resource) (*domain.Resource, error)
 }
 
 type ResourceServiceImpl struct {
@@ -26,6 +27,10 @@ func (r *ResourceServiceImpl) GetResource(id string) (*domain.Resource, error) {
 
 func (r *ResourceServiceImpl) GetResources() []domain.Resource {
 	return r.resourceRepository.GetResources()
+}
+
+func (r *ResourceServiceImpl) PostResource(resource *domain.Resource) (*domain.Resource, error) {
+	return nil, nil //TODO implement this
 }
 
 func NewResourceService(resourceRepository repository.ResourceRepository) ResourceService {
