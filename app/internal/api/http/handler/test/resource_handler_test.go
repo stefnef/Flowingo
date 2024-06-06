@@ -1,12 +1,15 @@
 package handler_test
 
 import (
+	"bytes"
+	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 	"github.com/stefnef/Flowingo/m/internal/api/http/dto"
 	"github.com/stefnef/Flowingo/m/internal/api/http/handler"
 	"github.com/stefnef/Flowingo/m/internal/core/domain"
 	"github.com/stretchr/testify/assert"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -17,16 +20,16 @@ type ResourceServiceMock struct {
 var getResources func() []domain.Resource
 var getResource func() (*domain.Resource, error)
 
-func (service *ResourceServiceMock) GetResources() []domain.Resource {
-	return getResources()
-}
-
 const functionGetResource = "GetResource"
 
 func (service *ResourceServiceMock) recordFunctionCall(function string, parameterName string, parameterValue string) {
 	if service.slot != nil {
 		service.slot.appendParameter(function, parameterName, parameterValue)
 	}
+}
+
+func (service *ResourceServiceMock) GetResources() []domain.Resource {
+	return getResources()
 }
 
 func (service *ResourceServiceMock) GetResource(id string) (*domain.Resource, error) {
@@ -155,21 +158,40 @@ func Test_GetResource(t *testing.T) {
 func TestResourceHandler_error_on_missing_param_name(t *testing.T) {
 	var context, recorder = GetTestGinContext()
 	recorder.Code = 000
+	var requestBody = `{"i-do-not-exist":"1"}`
 
+	preparePost(context, "/resource/some-id", requestBody)
 	resourceHandler.PostResource(context)
 
 	assert.NotEmpty(t, context.Errors)
 	assert.Equal(t, 400, recorder.Code)
 	assert.Len(t, context.Errors, 1)
-	assert.Equal(t, "invalid request", (*context.Errors[0]).Err.Error())
+	var expectedError = `Key: 'some.Name' Error:Field validation for 'Name' failed on the 'required' tag`
+	assert.Equal(t, expectedError, (*context.Errors[0]).Err.Error())
 }
 
-func TestResourceHandler_error_on_wrong_type_for_parame_name(t *testing.T) {
-	var context, _ = GetTestGinContext()
+func TestResourceHandler_error_on_wrong_type_for_parameter_name(t *testing.T) {
+	var context, recorder = GetTestGinContext()
+	var requestBody = `{"name":1}`
 
+	preparePost(context, "/resource/some-id", requestBody)
 	resourceHandler.PostResource(context)
 
 	assert.NotEmpty(t, context.Errors)
-	assert.Len(t, context.Errors, 1)
-	assert.Equal(t, "invalid request", (*context.Errors[0]).Err.Error())
+	assert.Equal(t, 400, recorder.Code)
+}
+
+func TestResourceHandler_should_delegate_to_service(t *testing.T) {
+	var context, recorder = GetTestGinContext()
+	var requestBody = `{"name":"some value"}`
+
+	preparePost(context, "/resource/some-id", requestBody)
+	resourceHandler.PostResource(context)
+
+	assert.Empty(t, context.Errors)
+	assert.Equal(t, http.StatusCreated, recorder.Code)
+}
+
+func preparePost(context *gin.Context, path string, content string) {
+	context.Request = httptest.NewRequest("POST", path, bytes.NewBuffer([]byte(content)))
 }
