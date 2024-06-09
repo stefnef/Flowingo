@@ -30,7 +30,11 @@ func (r *ResourceServiceImpl) GetResources() []domain.Resource {
 }
 
 func (r *ResourceServiceImpl) PostResource(resourceName string) (*domain.Resource, error) {
-	return nil, domain.NewAlreadyExistsError(resourceName)
+	if exists := r.resourceRepository.ExistsResourceByName(resourceName); exists != false {
+		return nil, domain.NewAlreadyExistsError(resourceName)
+	}
+
+	return r.resourceRepository.SaveResource(resourceName), nil
 }
 
 func NewResourceService(resourceRepository repository.ResourceRepository) ResourceService {

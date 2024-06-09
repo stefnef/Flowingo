@@ -12,6 +12,7 @@ type ResourceRepositoryMock struct{}
 var existsResourceByName func(name string) bool
 var getResources func() []domain.Resource
 var getResourceById func(id string) (*domain.Resource, error)
+var saveResource func(name string) *domain.Resource
 
 func (repository *ResourceRepositoryMock) GetResources() []domain.Resource {
 	return getResources()
@@ -22,6 +23,10 @@ func (repository *ResourceRepositoryMock) GetResourceById(id string) (*domain.Re
 
 func (repository *ResourceRepositoryMock) ExistsResourceByName(name string) bool {
 	return existsResourceByName(name)
+}
+
+func (repository *ResourceRepositoryMock) SaveResource(name string) *domain.Resource {
+	return saveResource(name)
 }
 
 var resourceRepository = &ResourceRepositoryMock{}
@@ -87,11 +92,34 @@ func TestResourceServiceImpl_PostResource_throws_error_if_already_exists(t *test
 	var alreadyExistsError = domain.NewAlreadyExistsError(name)
 
 	existsResourceByName = func(name string) bool {
+		return true
+	}
+
+	resource, err := resourceService.PostResource(name)
+
+	assert.Equal(t, alreadyExistsError, err)
+	assert.Nil(t, resource)
+}
+
+func TestResourceServiceImpl_PostResource_saves(t *testing.T) {
+	name := "new-resource"
+	expectedResource := &domain.Resource{
+		Id:          "some-id",
+		Name:        name,
+		MagicNumber: 21,
+	}
+
+	existsResourceByName = func(name string) bool {
 		return false
 	}
 
-	found, err := resourceService.PostResource(name)
+	saveResource = func(name string) *domain.Resource {
+		return expectedResource
+	}
 
-	assert.Equal(t, alreadyExistsError, err)
-	assert.Nil(t, found)
+	resource, err := resourceService.PostResource(name)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, resource)
+	assert.Equal(t, expectedResource, resource)
 }

@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 	"github.com/stefnef/Flowingo/m/internal/core/domain"
 )
 
@@ -38,6 +37,10 @@ func (i InternalResourceRepositoryImpl) GetResourceById(id string) (*domain.Reso
 }
 
 func (i InternalResourceRepositoryImpl) ExistsResourceByName(name string) bool {
-	context.TODO()
+	//TODO implement
 	return true
+}
+
+func (i InternalResourceRepositoryImpl) SaveResource(name string) *domain.Resource {
+	return nil //TODO implement
 }
