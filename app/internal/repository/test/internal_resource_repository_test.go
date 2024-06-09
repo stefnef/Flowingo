@@ -95,14 +95,10 @@ func TestResourceRepositoryImpl_ExistsResourceByName(t *testing.T) {
 }
 
 func TestResourceRepositoryImpl_SaveResource(t *testing.T) {
-	var expectedResource = &domain.Resource{
-		Id:          "",
-		Name:        "some-new-name",
-		MagicNumber: 0,
-	}
 
 	resource := resourceRepository.SaveResource("some-new-name")
 
 	assert.NotNil(t, resource)
-	assert.Equal(t, expectedResource, resource)
+	assert.Equal(t, "some-new-name", resource.Name)
+	assert.NotEqual(t, 0, resource.MagicNumber)
 }

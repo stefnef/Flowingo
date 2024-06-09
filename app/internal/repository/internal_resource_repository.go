@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/stefnef/Flowingo/m/internal/core/domain"
+	"math/rand"
 )
 
 type InternalResourceRepositoryImpl struct{}
@@ -46,9 +47,11 @@ func (i InternalResourceRepositoryImpl) ExistsResourceByName(name string) bool {
 }
 
 func (i InternalResourceRepositoryImpl) SaveResource(name string) *domain.Resource {
+	var magicNumber = rand.Int()
+
 	return &domain.Resource{
 		Id:          "",
 		Name:        name,
-		MagicNumber: 0,
+		MagicNumber: magicNumber,
 	}
 }
