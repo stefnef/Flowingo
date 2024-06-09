@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/stefnef/Flowingo/m/internal/core/domain"
 	"math/rand"
 )
@@ -47,11 +48,16 @@ func (i InternalResourceRepositoryImpl) ExistsResourceByName(name string) bool {
 }
 
 func (i InternalResourceRepositoryImpl) SaveResource(name string) *domain.Resource {
-	var magicNumber = rand.Int()
+	var magicNumber = rand.Int() //TODO move this to a generator service
+	var id = rand.Int()
 
-	return &domain.Resource{
-		Id:          "",
+	resource := &domain.Resource{
+		Id:          fmt.Sprintf("%d", id),
 		Name:        name,
 		MagicNumber: magicNumber,
 	}
+
+	resourceData = append(resourceData, *resource)
+
+	return resource
 }

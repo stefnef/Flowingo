@@ -99,6 +99,17 @@ func TestResourceRepositoryImpl_SaveResource(t *testing.T) {
 	resource := resourceRepository.SaveResource("some-new-name")
 
 	assert.NotNil(t, resource)
+	assert.NotEqual(t, "", resource.Id)
 	assert.Equal(t, "some-new-name", resource.Name)
 	assert.NotEqual(t, 0, resource.MagicNumber)
+}
+
+func TestResourceRepositoryImpl_SaveResource_and_find_by_id(t *testing.T) {
+	savedResource := resourceRepository.SaveResource("new-resource")
+
+	foundResource, err := resourceRepository.GetResourceById(savedResource.Id)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, foundResource)
+	assert.Equal(t, savedResource, foundResource)
 }
