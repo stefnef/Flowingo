@@ -2,6 +2,7 @@ package handler_test
 
 import (
 	"bytes"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 	"github.com/stefnef/Flowingo/m/internal/api/http/dto"
@@ -186,7 +187,7 @@ func TestResourceHandler_error_on_wrong_type_for_parameter_name(t *testing.T) {
 	assert.Equal(t, 400, recorder.Code)
 }
 
-func TestResourceHandler_should_delegate_to_service(t *testing.T) {
+func TestResourceHandler_PostResource_should_delegate_to_service(t *testing.T) {
 	var context, recorder = GetTestGinContext()
 	var requestBody = `{"name":"some value"}`
 	var resourceDto dto.ResourceResponseDto
@@ -201,8 +202,8 @@ func TestResourceHandler_should_delegate_to_service(t *testing.T) {
 			Id: "some-id", Name: resourceName, MagicNumber: 21,
 		}, nil
 	}
-
 	preparePost(context, "/resource", requestBody)
+
 	resourceHandler.PostResource(context)
 
 	var err = json.Unmarshal(recorder.Body.Bytes(), &resourceDto)
@@ -211,6 +212,25 @@ func TestResourceHandler_should_delegate_to_service(t *testing.T) {
 	assert.Empty(t, context.Errors)
 	assert.Equal(t, http.StatusCreated, recorder.Code)
 	assert.Equal(t, expectedDto, resourceDto)
+}
+
+func TestResourceHandlerImpl_PostResource_propagate_error(t *testing.T) {
+	var context, recorder = GetTestGinContext()
+	recorder.Code = 123
+	var requestBody = `{"name":"some-error"}`
+	var errorFromService = errors.New("fake")
+
+	postResource = func(resourceName string) (*domain.Resource, error) {
+		return nil, errorFromService
+	}
+	preparePost(context, "/resource", requestBody)
+
+	resourceHandler.PostResource(context)
+
+	assert.NotEmpty(t, context.Errors)
+	assert.Len(t, context.Errors, 1)
+	assert.Equal(t, errorFromService, (*context.Errors[0]).Err)
+	assert.Equal(t, 123, recorder.Code)
 }
 
 //TODO add test: POST /resource/some-id should not work

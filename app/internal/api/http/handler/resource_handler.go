@@ -48,9 +48,13 @@ func (handler *ResourceHandlerImpl) PostResource(context *gin.Context) {
 		return
 	}
 
-	resource, _ := handler.resourceService.PostResource(request.Name)
+	resource, err := handler.resourceService.PostResource(request.Name)
 
-	context.JSON(http.StatusCreated, resource)
+	if err != nil {
+		_ = context.Error(err)
+	} else {
+		context.JSON(http.StatusCreated, resource)
+	}
 }
 
 func NewResourceHandler(resourceService service.ResourceService) *ResourceHandlerImpl {
