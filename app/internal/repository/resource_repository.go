@@ -7,4 +7,5 @@ import (
 type ResourceRepository interface {
 	GetResources() []domain.Resource
 	GetResourceById(id string) (*domain.Resource, error)
+	ExistsResourceByName(name string) bool
 }

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"github.com/stefnef/Flowingo/m/internal/core/domain"
 )
 
@@ -19,6 +20,10 @@ var resourceData = []domain.Resource{
 	},
 }
 
+func NewInternalResourceRepository() ResourceRepository {
+	return &InternalResourceRepositoryImpl{}
+}
+
 func (i InternalResourceRepositoryImpl) GetResources() []domain.Resource {
 	return resourceData
 }
@@ -32,6 +37,7 @@ func (i InternalResourceRepositoryImpl) GetResourceById(id string) (*domain.Reso
 	return nil, domain.NewNotFoundError("resource", id)
 }
 
-func NewInternalResourceRepository() ResourceRepository {
-	return &InternalResourceRepositoryImpl{}
+func (i InternalResourceRepositoryImpl) ExistsResourceByName(name string) bool {
+	context.TODO()
+	return true
 }
