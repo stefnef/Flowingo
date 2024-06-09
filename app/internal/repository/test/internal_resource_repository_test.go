@@ -7,19 +7,30 @@ import (
 	"testing"
 )
 
-var resourceRepository = repository.NewInternalResourceRepository()
+type GeneratorMock struct{}
 
-var resourceData = []domain.Resource{
-	{
-		Id:          "some-id",
-		Name:        "Some Name",
-		MagicNumber: 41,
-	},
-	{
-		Id:          "some-other-id",
-		Name:        "Some Other Name",
-		MagicNumber: 37,
-	},
+func (g *GeneratorMock) GenerateUUID() string {
+	return "some-uuid"
+}
+
+var generator = &GeneratorMock{}
+var resourceRepository = repository.NewInternalResourceRepository(generator)
+var resourceData []domain.Resource
+
+func setup() {
+	resourceData = []domain.Resource{
+		{
+			Id:          "some-id",
+			Name:        "Some Name",
+			MagicNumber: 41,
+		},
+		{
+			Id:          "some-other-id",
+			Name:        "Some Other Name",
+			MagicNumber: 37,
+		},
+	}
+	resourceRepository = repository.NewInternalResourceRepository(generator)
 }
 
 func TestResourceRepositoryImpl_Is_ResourceRepository(t *testing.T) {
@@ -27,6 +38,8 @@ func TestResourceRepositoryImpl_Is_ResourceRepository(t *testing.T) {
 }
 
 func TestResourceRepositoryImpl_GetResources(t *testing.T) {
+	setup()
+
 	var expectedResources = resourceData
 	var resources = resourceRepository.GetResources()
 
@@ -35,6 +48,8 @@ func TestResourceRepositoryImpl_GetResources(t *testing.T) {
 }
 
 func TestResourceRepositoryImpl_GetResource(t *testing.T) {
+	setup()
+
 	var expectedResource = resourceData[0]
 	var resource, _ = resourceRepository.GetResourceById("some-id")
 
@@ -43,6 +58,8 @@ func TestResourceRepositoryImpl_GetResource(t *testing.T) {
 }
 
 func TestResourceRepositoryImpl_GetResource_By_id(t *testing.T) {
+	setup()
+
 	tests := []struct {
 		id   string
 		want domain.Resource
@@ -66,6 +83,8 @@ func TestResourceRepositoryImpl_GetResource_By_id(t *testing.T) {
 }
 
 func TestResourceRepositoryImpl_GetResource_throws(t *testing.T) {
+	setup()
+
 	element, err := resourceRepository.GetResourceById("i-do-not-exist")
 	assert.Nil(t, element)
 	assert.NotNil(t, err)
@@ -73,6 +92,8 @@ func TestResourceRepositoryImpl_GetResource_throws(t *testing.T) {
 }
 
 func TestResourceRepositoryImpl_ExistsResourceByName(t *testing.T) {
+	setup()
+
 	tests := []struct {
 		name string
 		want bool
@@ -95,16 +116,20 @@ func TestResourceRepositoryImpl_ExistsResourceByName(t *testing.T) {
 }
 
 func TestResourceRepositoryImpl_SaveResource(t *testing.T) {
+	setup()
+	var expectedUUID = "some-uuid"
 
 	resource := resourceRepository.SaveResource("some-new-name")
 
 	assert.NotNil(t, resource)
-	assert.NotEqual(t, "", resource.Id)
+	assert.Equal(t, expectedUUID, resource.Id)
 	assert.Equal(t, "some-new-name", resource.Name)
 	assert.NotEqual(t, 0, resource.MagicNumber)
 }
 
 func TestResourceRepositoryImpl_SaveResource_and_find_by_id(t *testing.T) {
+	setup()
+
 	savedResource := resourceRepository.SaveResource("new-resource")
 
 	foundResource, err := resourceRepository.GetResourceById(savedResource.Id)

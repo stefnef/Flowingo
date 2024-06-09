@@ -14,13 +14,15 @@ import (
 	"github.com/stefnef/Flowingo/m/internal/api/http/handler"
 	"github.com/stefnef/Flowingo/m/internal/core/service"
 	"github.com/stefnef/Flowingo/m/internal/repository"
+	"github.com/stefnef/Flowingo/m/pkg"
 	"log"
 )
 
 func main() {
 	log.Printf("Server started")
 
-	var resourceRepository = repository.NewInternalResourceRepository()
+	var generator = pkg.NewGeneratorImpl()
+	var resourceRepository = repository.NewInternalResourceRepository(generator)
 	var infoHandler = handler.NewInfoHandler(service.NewInfoService())
 	var resourceHandler = handler.NewResourceHandler(service.NewResourceService(resourceRepository))
 	var errorHandler = handler.NewErrorHandler()

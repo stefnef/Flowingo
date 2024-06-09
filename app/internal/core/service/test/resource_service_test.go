@@ -17,6 +17,7 @@ var saveResource func(name string) *domain.Resource
 func (repository *ResourceRepositoryMock) GetResources() []domain.Resource {
 	return getResources()
 }
+
 func (repository *ResourceRepositoryMock) GetResourceById(id string) (*domain.Resource, error) {
 	return getResourceById(id)
 }

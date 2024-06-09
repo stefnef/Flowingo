@@ -1,28 +1,33 @@
 package repository
 
 import (
-	"fmt"
 	"github.com/stefnef/Flowingo/m/internal/core/domain"
+	"github.com/stefnef/Flowingo/m/pkg"
 	"math/rand"
 )
 
-type InternalResourceRepositoryImpl struct{}
-
-var resourceData = []domain.Resource{
-	{
-		Id:          "some-id",
-		Name:        "Some Name",
-		MagicNumber: 41,
-	},
-	{
-		Id:          "some-other-id",
-		Name:        "Some Other Name",
-		MagicNumber: 37,
-	},
+type InternalResourceRepositoryImpl struct {
+	generator pkg.Generator
 }
 
-func NewInternalResourceRepository() ResourceRepository {
-	return &InternalResourceRepositoryImpl{}
+var resourceData []domain.Resource
+
+func NewInternalResourceRepository(generator pkg.Generator) ResourceRepository {
+	resourceData = []domain.Resource{
+		{
+			Id:          "some-id",
+			Name:        "Some Name",
+			MagicNumber: 41,
+		},
+		{
+			Id:          "some-other-id",
+			Name:        "Some Other Name",
+			MagicNumber: 37,
+		},
+	}
+	return &InternalResourceRepositoryImpl{
+		generator: generator,
+	}
 }
 
 func (i InternalResourceRepositoryImpl) GetResources() []domain.Resource {
@@ -49,10 +54,10 @@ func (i InternalResourceRepositoryImpl) ExistsResourceByName(name string) bool {
 
 func (i InternalResourceRepositoryImpl) SaveResource(name string) *domain.Resource {
 	var magicNumber = rand.Int() //TODO move this to a generator service
-	var id = rand.Int()
+	var id = i.generator.GenerateUUID()
 
 	resource := &domain.Resource{
-		Id:          fmt.Sprintf("%d", id),
+		Id:          id,
 		Name:        name,
 		MagicNumber: magicNumber,
 	}
