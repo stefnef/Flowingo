@@ -71,3 +71,25 @@ func TestResourceRepositoryImpl_GetResource_throws(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.ErrorContains(t, err, "could not find resource 'resource' with id 'i-do-not-exist'")
 }
+
+func TestResourceRepositoryImpl_ExistsResourceByName(t *testing.T) {
+	tests := []struct {
+		name string
+		want bool
+	}{
+		{
+			name: "Some Name",
+			want: true,
+		},
+		{
+			name: "i-do-not-exist",
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			act := resourceRepository.ExistsResourceByName(tt.name)
+			assert.Equal(t, tt.want, act)
+		})
+	}
+}

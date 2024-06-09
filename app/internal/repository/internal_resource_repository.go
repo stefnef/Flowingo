@@ -37,8 +37,12 @@ func (i InternalResourceRepositoryImpl) GetResourceById(id string) (*domain.Reso
 }
 
 func (i InternalResourceRepositoryImpl) ExistsResourceByName(name string) bool {
-	//TODO implement
-	return true
+	for _, resource := range resourceData {
+		if name == resource.Name {
+			return true
+		}
+	}
+	return false
 }
 
 func (i InternalResourceRepositoryImpl) SaveResource(name string) *domain.Resource {
