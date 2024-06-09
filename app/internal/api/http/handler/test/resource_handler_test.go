@@ -19,7 +19,7 @@ type ResourceServiceMock struct {
 
 var getResources func() []domain.Resource
 var getResource func() (*domain.Resource, error)
-var postResource func(resource *domain.Resource) (*domain.Resource, error)
+var postResource func(resourceName string) (*domain.Resource, error)
 
 const functionGetResource = "GetResource"
 
@@ -38,8 +38,8 @@ func (service *ResourceServiceMock) GetResource(id string) (*domain.Resource, er
 	return getResource()
 }
 
-func (service *ResourceServiceMock) PostResource(resource *domain.Resource) (*domain.Resource, error) {
-	return postResource(resource)
+func (service *ResourceServiceMock) PostResource(resourceName string) (*domain.Resource, error) {
+	return postResource(resourceName)
 }
 
 func initResourceHandlerSlot(t *testing.T) {
@@ -171,7 +171,7 @@ func TestResourceHandler_error_on_missing_param_name(t *testing.T) {
 	assert.NotEmpty(t, context.Errors)
 	assert.Equal(t, 400, recorder.Code)
 	assert.Len(t, context.Errors, 1)
-	var expectedError = `Key: 'some.Name' Error:Field validation for 'Name' failed on the 'required' tag`
+	var expectedError = `Key: 'resourceDto.Name' Error:Field validation for 'Name' failed on the 'required' tag`
 	assert.Equal(t, expectedError, (*context.Errors[0]).Err.Error())
 }
 
@@ -189,16 +189,28 @@ func TestResourceHandler_error_on_wrong_type_for_parameter_name(t *testing.T) {
 func TestResourceHandler_should_delegate_to_service(t *testing.T) {
 	var context, recorder = GetTestGinContext()
 	var requestBody = `{"name":"some value"}`
+	var resourceDto dto.ResourceResponseDto
+	var expectedDto = dto.ResourceResponseDto{
+		Id:          "some-id",
+		Name:        "some value",
+		MagicNumber: 21,
+	}
 
-	postResource = func(resource *domain.Resource) (*domain.Resource, error) {
-		return resource, nil //TODO hier weiter, es muss ein unterschiedliches resource object sein
+	postResource = func(resourceName string) (*domain.Resource, error) {
+		return &domain.Resource{
+			Id: "some-id", Name: resourceName, MagicNumber: 21,
+		}, nil
 	}
 
 	preparePost(context, "/resource", requestBody)
 	resourceHandler.PostResource(context)
 
+	var err = json.Unmarshal(recorder.Body.Bytes(), &resourceDto)
+
+	assert.Nil(t, err)
 	assert.Empty(t, context.Errors)
 	assert.Equal(t, http.StatusCreated, recorder.Code)
+	assert.Equal(t, expectedDto, resourceDto)
 }
 
 //TODO add test: POST /resource/some-id should not work

@@ -37,18 +37,20 @@ func (handler *ResourceHandlerImpl) GetResources(context *gin.Context) {
 	context.JSON(http.StatusOK, resources)
 }
 
-type some struct {
+type resourceDto struct {
 	Name string `json:"name" binding:"required"`
 }
 
 func (handler *ResourceHandlerImpl) PostResource(context *gin.Context) {
-	var request *some
+	var request *resourceDto
 	err := context.BindJSON(&request)
 	if err != nil {
 		return
 	}
-	//TODO hier weiter
-	context.JSON(http.StatusCreated, request)
+
+	resource, _ := handler.resourceService.PostResource(request.Name)
+
+	context.JSON(http.StatusCreated, resource)
 }
 
 func NewResourceHandler(resourceService service.ResourceService) *ResourceHandlerImpl {
