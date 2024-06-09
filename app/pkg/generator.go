@@ -11,12 +11,11 @@ type Generator interface {
 }
 
 type GeneratorImpl struct {
-	uuid uuid.UUID
 	rand *rand.Rand
 }
 
 func (g GeneratorImpl) GenerateUUID() string {
-	return g.uuid.String()
+	return uuid.NewString()
 }
 
 func (g GeneratorImpl) GenerateNumber() int {
@@ -25,7 +24,6 @@ func (g GeneratorImpl) GenerateNumber() int {
 
 func NewGeneratorImpl() GeneratorImpl {
 	return GeneratorImpl{
-		uuid: uuid.New(),
 		rand: rand.New(rand.NewSource(int64(rand.Uint64()))),
 	}
 }

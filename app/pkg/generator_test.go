@@ -14,9 +14,11 @@ func TestGeneratorImpl_ImplementsInterface(t *testing.T) {
 
 func TestGeneratorImpl_GenerateUUID(t *testing.T) {
 	var uuid = generator.GenerateUUID()
+	var anotherUuid = generator.GenerateUUID()
 
 	assert.NotEmpty(t, uuid)
 	assert.True(t, isUUID(uuid))
+	assert.NotEqual(t, anotherUuid, uuid)
 }
 
 func TestGeneratorImpl_GenerateNumber(t *testing.T) {
