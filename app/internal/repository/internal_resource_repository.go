@@ -46,5 +46,9 @@ func (i InternalResourceRepositoryImpl) ExistsResourceByName(name string) bool {
 }
 
 func (i InternalResourceRepositoryImpl) SaveResource(name string) *domain.Resource {
-	return nil //TODO implement
+	return &domain.Resource{
+		Id:          "",
+		Name:        name,
+		MagicNumber: 0,
+	}
 }
