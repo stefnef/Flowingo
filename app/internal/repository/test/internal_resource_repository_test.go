@@ -7,13 +7,17 @@ import (
 	"testing"
 )
 
-type GeneratorMock struct{}
+type generatorMock struct{}
 
-func (g *GeneratorMock) GenerateUUID() string {
+func (g *generatorMock) GenerateUUID() string {
 	return "some-uuid"
 }
 
-var generator = &GeneratorMock{}
+func (g *generatorMock) GenerateNumber() int {
+	return 21
+}
+
+var generator = &generatorMock{}
 var resourceRepository = repository.NewInternalResourceRepository(generator)
 var resourceData []domain.Resource
 
@@ -119,18 +123,18 @@ func TestResourceRepositoryImpl_SaveResource(t *testing.T) {
 	setup()
 	var expectedUUID = "some-uuid"
 
-	resource := resourceRepository.SaveResource("some-new-name")
+	resource := resourceRepository.SaveResource("some-new-name", 19)
 
 	assert.NotNil(t, resource)
 	assert.Equal(t, expectedUUID, resource.Id)
 	assert.Equal(t, "some-new-name", resource.Name)
-	assert.NotEqual(t, 0, resource.MagicNumber)
+	assert.Equal(t, 19, resource.MagicNumber)
 }
 
 func TestResourceRepositoryImpl_SaveResource_and_find_by_id(t *testing.T) {
 	setup()
 
-	savedResource := resourceRepository.SaveResource("new-resource")
+	savedResource := resourceRepository.SaveResource("new-resource", 21)
 
 	foundResource, err := resourceRepository.GetResourceById(savedResource.Id)
 

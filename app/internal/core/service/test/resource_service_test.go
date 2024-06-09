@@ -7,12 +7,14 @@ import (
 	"testing"
 )
 
-type ResourceRepositoryMock struct{}
+type ResourceRepositoryMock struct {
+	Slots map[string]interface{}
+}
 
 var existsResourceByName func(name string) bool
 var getResources func() []domain.Resource
 var getResourceById func(id string) (*domain.Resource, error)
-var saveResource func(name string) *domain.Resource
+var saveResource func(name string, magicNumber int) *domain.Resource
 
 func (repository *ResourceRepositoryMock) GetResources() []domain.Resource {
 	return getResources()
@@ -26,12 +28,26 @@ func (repository *ResourceRepositoryMock) ExistsResourceByName(name string) bool
 	return existsResourceByName(name)
 }
 
-func (repository *ResourceRepositoryMock) SaveResource(name string) *domain.Resource {
-	return saveResource(name)
+func (repository *ResourceRepositoryMock) SaveResource(name string, magicNumber int) *domain.Resource {
+	repository.Slots["SaveResource"] = []interface{}{name, magicNumber}
+	return saveResource(name, magicNumber)
 }
 
-var resourceRepository = &ResourceRepositoryMock{}
-var resourceService = service.NewResourceService(resourceRepository)
+type generatorMock struct{}
+
+func (g *generatorMock) GenerateUUID() string {
+	return "some-uuid"
+}
+
+var magicNumber = 212121
+
+func (g *generatorMock) GenerateNumber() int {
+	return magicNumber
+}
+
+var resourceRepository = &ResourceRepositoryMock{Slots: make(map[string]interface{})}
+var generator = &generatorMock{}
+var resourceService = service.NewResourceService(resourceRepository, generator)
 
 func TestGetResources(t *testing.T) {
 	var expectedResources = []domain.Resource{
@@ -107,14 +123,14 @@ func TestResourceServiceImpl_PostResource_saves(t *testing.T) {
 	expectedResource := &domain.Resource{
 		Id:          "some-id",
 		Name:        name,
-		MagicNumber: 21,
+		MagicNumber: magicNumber,
 	}
 
 	existsResourceByName = func(name string) bool {
 		return false
 	}
 
-	saveResource = func(name string) *domain.Resource {
+	saveResource = func(name string, magicNumber int) *domain.Resource {
 		return expectedResource
 	}
 
@@ -123,4 +139,7 @@ func TestResourceServiceImpl_PostResource_saves(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, resource)
 	assert.Equal(t, expectedResource, resource)
+
+	var calls = resourceRepository.Slots["SaveResource"]
+	assert.Equal(t, []interface{}{name, magicNumber}, calls)
 }

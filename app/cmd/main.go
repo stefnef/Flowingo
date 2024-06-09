@@ -24,7 +24,7 @@ func main() {
 	var generator = pkg.NewGeneratorImpl()
 	var resourceRepository = repository.NewInternalResourceRepository(generator)
 	var infoHandler = handler.NewInfoHandler(service.NewInfoService())
-	var resourceHandler = handler.NewResourceHandler(service.NewResourceService(resourceRepository))
+	var resourceHandler = handler.NewResourceHandler(service.NewResourceService(resourceRepository, generator))
 	var errorHandler = handler.NewErrorHandler()
 
 	router := sw.NewRouter(infoHandler, resourceHandler, errorHandler)

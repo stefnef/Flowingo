@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/stefnef/Flowingo/m/internal/core/domain"
 	"github.com/stefnef/Flowingo/m/internal/repository"
+	"github.com/stefnef/Flowingo/m/pkg"
 )
 
 type ResourceService interface {
@@ -13,6 +14,7 @@ type ResourceService interface {
 
 type ResourceServiceImpl struct {
 	resourceRepository repository.ResourceRepository
+	generator          pkg.Generator
 }
 
 func (r *ResourceServiceImpl) GetResource(id string) (*domain.Resource, error) {
@@ -34,11 +36,14 @@ func (r *ResourceServiceImpl) PostResource(resourceName string) (*domain.Resourc
 		return nil, domain.NewAlreadyExistsError(resourceName)
 	}
 
-	return r.resourceRepository.SaveResource(resourceName), nil
+	var magicNumber = r.generator.GenerateNumber()
+
+	return r.resourceRepository.SaveResource(resourceName, magicNumber), nil
 }
 
-func NewResourceService(resourceRepository repository.ResourceRepository) ResourceService {
+func NewResourceService(resourceRepository repository.ResourceRepository, generator pkg.Generator) ResourceService {
 	return &ResourceServiceImpl{
 		resourceRepository: resourceRepository,
+		generator:          generator,
 	}
 }
