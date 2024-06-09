@@ -30,7 +30,7 @@ func (r *ResourceServiceImpl) GetResources() []domain.Resource {
 }
 
 func (r *ResourceServiceImpl) PostResource(resourceName string) (*domain.Resource, error) {
-	return nil, nil //TODO implement this
+	return nil, domain.NewAlreadyExistsError(resourceName)
 }
 
 func NewResourceService(resourceRepository repository.ResourceRepository) ResourceService {

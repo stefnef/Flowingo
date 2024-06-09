@@ -9,6 +9,7 @@ import (
 
 type ResourceRepositoryMock struct{}
 
+var existsResourceByName func(name string) bool
 var getResources func() []domain.Resource
 var getResourceById func(id string) (*domain.Resource, error)
 
@@ -17,6 +18,10 @@ func (repository *ResourceRepositoryMock) GetResources() []domain.Resource {
 }
 func (repository *ResourceRepositoryMock) GetResourceById(id string) (*domain.Resource, error) {
 	return getResourceById(id)
+}
+
+func (repository *ResourceRepositoryMock) ExistsResourceByName(name string) bool {
+	return existsResourceByName(name)
 }
 
 var resourceRepository = &ResourceRepositoryMock{}
@@ -74,5 +79,19 @@ func TestResourceServiceImpl_GetResource_propagates_not_found_error(t *testing.T
 	found, err := resourceService.GetResource(id)
 
 	assert.Equal(t, notFoundError, err)
+	assert.Nil(t, found)
+}
+
+func TestResourceServiceImpl_PostResource_throws_error_if_already_exists(t *testing.T) {
+	name := "i-exist"
+	var alreadyExistsError = domain.NewAlreadyExistsError(name)
+
+	existsResourceByName = func(name string) bool {
+		return false
+	}
+
+	found, err := resourceService.PostResource(name)
+
+	assert.Equal(t, alreadyExistsError, err)
 	assert.Nil(t, found)
 }
