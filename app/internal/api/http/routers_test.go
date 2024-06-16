@@ -56,6 +56,14 @@ func setup() {
 	response = responseMock{Text: ""}
 }
 
+func TestNotFoundOnWrongPath(t *testing.T) {
+	setup()
+	recorder := doRequest("GET", "/")
+
+	assert.Equal(t, "404 page not found", recorder.Body.String())
+	assert.Equal(t, http.StatusNotFound, recorder.Code)
+}
+
 func TestInfoGet(t *testing.T) {
 	setup()
 	var infoResponse responseMock

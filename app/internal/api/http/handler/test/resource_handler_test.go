@@ -233,8 +233,6 @@ func TestResourceHandlerImpl_PostResource_propagate_error(t *testing.T) {
 	assert.Equal(t, 123, recorder.Code)
 }
 
-//TODO add test: POST /resource/some-id should not work
-
 func preparePost(context *gin.Context, path string, content string) {
 	context.Request = httptest.NewRequest("POST", path, bytes.NewBuffer([]byte(content)))
 }
