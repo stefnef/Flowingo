@@ -7,7 +7,6 @@ type NotFoundError struct {
 	ID       string
 }
 
-// TODO handle this error
 type AlreadyExistsError struct {
 	Name string
 }

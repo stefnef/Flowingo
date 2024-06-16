@@ -103,7 +103,7 @@ func TestResourcePost(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotEmpty(t, postSingleResourceResponse)
-	assert.Equal(t, "ResourcePost", postSingleResourceResponse.Text)
+	assert.Equal(t, "errorHandling -> ResourcePost", postSingleResourceResponse.Text)
 }
 
 func doRequest(method string, url string) *httptest.ResponseRecorder {

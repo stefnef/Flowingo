@@ -41,7 +41,7 @@ func NewRouter(infoHandler handler.InfoHandler, resourceHandler handler.Resource
 		case http.MethodGet:
 			router.GET(route.Pattern, errorHandler.HandleErrors, route.HandlerFunc)
 		case http.MethodPost:
-			router.POST(route.Pattern, route.HandlerFunc)
+			router.POST(route.Pattern, errorHandler.HandleErrors, route.HandlerFunc)
 		case http.MethodPut:
 			router.PUT(route.Pattern, route.HandlerFunc)
 		case http.MethodPatch:

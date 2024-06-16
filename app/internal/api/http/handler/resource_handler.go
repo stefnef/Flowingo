@@ -43,8 +43,7 @@ type resourceDto struct {
 
 func (handler *ResourceHandlerImpl) PostResource(context *gin.Context) {
 	var request *resourceDto
-	err := context.BindJSON(&request)
-	if err != nil {
+	if err := context.BindJSON(&request); err != nil {
 		return
 	}
 

@@ -26,10 +26,15 @@ func (errorHandler *ErrorHandlerImpl) HandleErrors(context *gin.Context) {
 
 func (errorHandler *ErrorHandlerImpl) handleError(context *gin.Context) {
 	for _, err := range context.Errors {
+
 		var notFoundError *domain.NotFoundError
+		var alreadyExistsError *domain.AlreadyExistsError
+
 		switch {
 		case errors.As(err.Err, &notFoundError):
 			context.AbortWithStatusJSON(http.StatusNotFound, err.JSON())
+		case errors.As(err.Err, &alreadyExistsError):
+			context.AbortWithStatusJSON(http.StatusBadRequest, err.JSON())
 		default:
 			internalServerError := map[string]string{"error": "internal server error"}
 			context.AbortWithStatusJSON(http.StatusInternalServerError, internalServerError)

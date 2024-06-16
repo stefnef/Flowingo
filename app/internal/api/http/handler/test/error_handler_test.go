@@ -38,23 +38,46 @@ func Test_should_do_nothing_if_there_is_no_error(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, recorder.Code)
 }
 
-func Test_should_map_not_found(t *testing.T) {
-	var context, recorder = GetTestGinContext()
-	recorder.Code = http.StatusCreated
-	var err = domain.NewNotFoundError("fake", "some-id")
-	var errorDto map[string]string
-	_ = context.Error(err)
+func Test_should_map_error(t *testing.T) {
+	tests := []struct {
+		name    string
+		err     error
+		status  int
+		message string
+	}{
+		{
+			"not found",
+			domain.NewNotFoundError("fake", "some-id"),
+			http.StatusNotFound,
+			"could not find resource 'fake' with id 'some-id'",
+		},
 
-	errorHandler.HandleErrors(context)
+		{
+			"already exists",
+			domain.NewAlreadyExistsError("fake"),
+			http.StatusBadRequest,
+			"resource with name 'fake' already exists",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var context, recorder = GetTestGinContext()
+			recorder.Code = http.StatusCreated
+			var errorDto map[string]string
+			_ = context.Error(test.err)
 
-	assert.Equal(t, http.StatusNotFound, recorder.Code)
-	var errJson = json.Unmarshal(recorder.Body.Bytes(), &errorDto)
+			errorHandler.HandleErrors(context)
 
-	assert.Nil(t, errJson)
-	assert.Equal(t, map[string]string{"error": "could not find resource 'fake' with id 'some-id'"}, errorDto)
+			assert.Equal(t, test.status, recorder.Code)
+			var errJson = json.Unmarshal(recorder.Body.Bytes(), &errorDto)
+
+			assert.Nil(t, errJson)
+			assert.Equal(t, map[string]string{"error": test.message}, errorDto)
+		})
+	}
 }
 
-func Test_should_unknown_error_to_server_error(t *testing.T) {
+func Test_should_map_unknown_error_to_server_error(t *testing.T) {
 	var context, recorder = GetTestGinContext()
 	recorder.Code = http.StatusCreated
 	var err = errors.New("i am an unknown error")
