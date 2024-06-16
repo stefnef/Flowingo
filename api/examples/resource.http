@@ -1,0 +1,19 @@
+### Get resources
+GET {{server}}/resource
+
+### Get Resource Id
+GET {{server}}/resource/{{resourceId}}
+
+### Post Resource
+POST {{server}}/resource
+Content-Type: application/json
+
+{
+  "name": "some-new-resource"
+}
+
+> {%
+    client.assert(response.status === 201)
+    let id = response.body.Id
+    client.global.set("resourceId", id)
+ %}

@@ -4,7 +4,8 @@ info:
   description: resource
   version: 1.0.0
 servers:
-  - url: 'http://localhost:8080'
+  - description: Dev
+    url: 'http://localhost:8080'
 
 tags:
   - name: info
