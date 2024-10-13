@@ -61,12 +61,65 @@ func Test_it_should_extract_token_from_header(t *testing.T) {
 	var _, recorder, engine = GetTestGinEngine()
 
 	verifyAuth = func(token string) error {
+		if token != "THE_TOKEN" {
+			return errors.New("WRONG token")
+		}
 		return nil
 	}
+
 	engine.GET("/", authHandler.VerifyAuthenticated)
 	req, _ := http.NewRequest("GET", "/", nil)
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", "token"))
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", "THE_TOKEN"))
 
 	engine.ServeHTTP(recorder, req)
 	assert.Equal(t, 200, recorder.Code)
+}
+
+func Test_it_should_throw_an_error_if_token_is_not_present_or_in_wrong_format(t *testing.T) {
+	var _, recorder, engine = GetTestGinEngine()
+
+	verifyAuth = func(token string) error {
+		if token != "THE_TOKEN" {
+			return errors.New("WRONG token")
+		}
+		return nil
+	}
+
+	engine.GET("/", authHandler.VerifyAuthenticated)
+	req, _ := http.NewRequest("GET", "/", nil)
+
+	tests := []struct {
+		id            string
+		authorization string
+		token         string
+	}{
+		{
+			id:            "empty strings",
+			authorization: "",
+			token:         "",
+		},
+		{
+			id:            "bearer missing",
+			authorization: "Authorization",
+			token:         fmt.Sprintf("Something Wrong %s", "THE_TOKEN"),
+		},
+		{
+			id:            "missing space after bearer",
+			authorization: "Authorization",
+			token:         fmt.Sprintf("Bearer%s", "THE_TOKEN"),
+		},
+		{
+			id:            "missing Authorization header",
+			authorization: "Some-Other",
+			token:         fmt.Sprintf("Bearer %s", "THE_TOKEN"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.id, func(t *testing.T) {
+			req.Header.Add(tt.authorization, tt.token)
+			engine.ServeHTTP(recorder, req)
+			assert.Equal(t, 403, recorder.Code)
+		})
+	}
 }

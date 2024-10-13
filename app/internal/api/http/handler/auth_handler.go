@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"strings"
 )
 
 type AuthHandler interface {
@@ -21,7 +22,11 @@ func NewAuthHandler(authService AuthService) *AuthHandlerImpl {
 }
 
 func (authHandler *AuthHandlerImpl) VerifyAuthenticated(context *gin.Context) {
-	var err = authHandler.authService.VerifyAuth("some-token") //TODO get token from context
+	var authHeader = context.GetHeader("Authorization")
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+	//TODO check not empty before giving to service
+
+	var err = authHandler.authService.VerifyAuth(tokenString)
 	if err != nil {
 		context.AbortWithStatus(403)
 	}
