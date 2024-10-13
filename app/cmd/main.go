@@ -10,7 +10,6 @@
 package main
 
 import (
-	"github.com/golang-jwt/jwt"
 	sw "github.com/stefnef/Flowingo/m/internal/api/http"
 	"github.com/stefnef/Flowingo/m/internal/api/http/handler"
 	"github.com/stefnef/Flowingo/m/internal/core/service"
@@ -22,10 +21,10 @@ import (
 // TODO replace by concrete service implementation
 type AuthServiceTmp struct{}
 
-var verifyAuth func(jwt jwt.Token) error
+var verifyAuth func(token string) error
 
-func (authServiceMock AuthServiceTmp) VerifyAuth(jwt jwt.Token) error {
-	return verifyAuth(jwt)
+func (authServiceMock AuthServiceTmp) VerifyAuth(token string) error {
+	return verifyAuth(token)
 }
 
 func main() {

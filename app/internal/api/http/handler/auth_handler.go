@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 )
 
 type AuthHandler interface {
@@ -10,7 +9,7 @@ type AuthHandler interface {
 }
 
 type AuthService interface {
-	VerifyAuth(jwt jwt.Token) error
+	VerifyAuth(token string) error
 }
 
 type AuthHandlerImpl struct {
@@ -22,7 +21,7 @@ func NewAuthHandler(authService AuthService) *AuthHandlerImpl {
 }
 
 func (authHandler *AuthHandlerImpl) VerifyAuthenticated(context *gin.Context) {
-	var err = authHandler.authService.VerifyAuth(jwt.Token{}) //TODO get token from context
+	var err = authHandler.authService.VerifyAuth("some-token") //TODO get token from context
 	if err != nil {
 		context.AbortWithStatus(403)
 	}
