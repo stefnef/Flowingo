@@ -10,6 +10,7 @@
 package main
 
 import (
+	"github.com/golang-jwt/jwt"
 	sw "github.com/stefnef/Flowingo/m/internal/api/http"
 	"github.com/stefnef/Flowingo/m/internal/api/http/handler"
 	"github.com/stefnef/Flowingo/m/internal/core/service"
@@ -18,6 +19,15 @@ import (
 	"log"
 )
 
+// TODO replace by concrete service implementation
+type AuthServiceTmp struct{}
+
+var verifyAuth func(jwt jwt.Token) error
+
+func (authServiceMock AuthServiceTmp) VerifyAuth(jwt jwt.Token) error {
+	return verifyAuth(jwt)
+}
+
 func main() {
 	log.Printf("Server started")
 
@@ -25,9 +35,10 @@ func main() {
 	var resourceRepository = repository.NewInternalResourceRepository(generator)
 	var infoHandler = handler.NewInfoHandler(service.NewInfoService())
 	var resourceHandler = handler.NewResourceHandler(service.NewResourceService(resourceRepository, generator))
+	var authHandler = handler.NewAuthHandler(&AuthServiceTmp{})
 	var errorHandler = handler.NewErrorHandler()
 
-	router := sw.NewRouter(infoHandler, resourceHandler, errorHandler)
+	router := sw.NewRouter(infoHandler, resourceHandler, authHandler, errorHandler)
 	_ = router.SetTrustedProxies(nil)
 
 	log.Fatal(router.Run(":8080"))

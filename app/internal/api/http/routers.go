@@ -23,7 +23,7 @@ type Route struct {
 type Routes []Route
 
 // NewRouter returns a new router.
-func NewRouter(infoHandler handler.InfoHandler, resourceHandler handler.ResourceHandler, errorHandler handler.ErrorHandler) *gin.Engine {
+func NewRouter(infoHandler handler.InfoHandler, resourceHandler handler.ResourceHandler, authHandler handler.AuthHandler, errorHandler handler.ErrorHandler) *gin.Engine {
 	router := gin.Default()
 	routes := getRoutes(infoHandler, resourceHandler)
 
@@ -32,7 +32,7 @@ func NewRouter(infoHandler handler.InfoHandler, resourceHandler handler.Resource
 		case http.MethodGet:
 			router.GET(route.Pattern, errorHandler.HandleErrors, route.HandlerFunc)
 		case http.MethodPost:
-			router.POST(route.Pattern, errorHandler.HandleErrors, route.HandlerFunc)
+			router.POST(route.Pattern, authHandler.VerifyAuthenticated, errorHandler.HandleErrors, route.HandlerFunc)
 		case http.MethodPut:
 			router.PUT(route.Pattern, route.HandlerFunc)
 		case http.MethodPatch:

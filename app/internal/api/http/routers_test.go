@@ -17,6 +17,7 @@ var response responseMock
 
 type infoHandlerMock struct{}
 type resourceHandlerMock struct{}
+type authHandlerMock struct{}
 type errorHandlerMock struct{}
 
 func (infoHandler *infoHandlerMock) GetInfo(ctx *gin.Context) {
@@ -39,18 +40,24 @@ func (resourceHandler *resourceHandlerMock) PostResource(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &response)
 }
 
+func (authHandlerMock *authHandlerMock) VerifyAuthenticated(ctx *gin.Context) {
+	response.Text += "verifyAuthenticated -> "
+	ctx.Next()
+}
+
 func (errorHandler *errorHandlerMock) HandleErrors(ctx *gin.Context) {
-	response.Text = "errorHandling -> "
+	response.Text += "errorHandling -> "
 	ctx.Next()
 }
 
 var (
 	infoHandler     = infoHandlerMock{}
 	resourceHandler = resourceHandlerMock{}
+	authHandler     = authHandlerMock{}
 	errorHandler    = errorHandlerMock{}
 )
 
-var router = NewRouter(&infoHandler, &resourceHandler, &errorHandler)
+var router = NewRouter(&infoHandler, &resourceHandler, &authHandler, &errorHandler)
 
 func setup() {
 	response = responseMock{Text: ""}
@@ -111,7 +118,7 @@ func TestResourcePost(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotEmpty(t, postSingleResourceResponse)
-	assert.Equal(t, "errorHandling -> ResourcePost", postSingleResourceResponse.Text)
+	assert.Equal(t, "verifyAuthenticated -> errorHandling -> ResourcePost", postSingleResourceResponse.Text)
 }
 
 func doRequest(method string, url string) *httptest.ResponseRecorder {
