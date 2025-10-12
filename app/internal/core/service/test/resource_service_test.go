@@ -1,10 +1,11 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/stefnef/Flowingo/m/internal/core/domain"
 	"github.com/stefnef/Flowingo/m/internal/core/service"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 type ResourceRepositoryMock struct {
